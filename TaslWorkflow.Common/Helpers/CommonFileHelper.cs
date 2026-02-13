@@ -17,13 +17,14 @@ public static class CommonFileHelper
             {
                 scheduledTasks.Add(new ScheduledTask
                 {
-                    CronExpression = fields[0],
-                    TaskName = fields[1],
-                    Description = fields[2],
-                    LastRunTime = Convert.ToDateTime(fields[3]),
-                    Status = fields[4],
-                    WebService = fields[5],
-                    DayOffset= Convert.ToInt32(fields[6])
+                    TaskId = Convert.ToInt64(fields[0]),
+                    CronExpression = fields[1],
+                    TaskName = fields[2],
+                    Description = fields[3],
+                    LastRunTime = Convert.ToDateTime(fields[4]),
+                    Status = fields[5],
+                    WebService = fields[6],
+                    DayOffset= Convert.ToInt32(fields[7])
                 });
             }
         }
@@ -44,7 +45,7 @@ public static class CommonFileHelper
         var lines = new List<string>(allTasks.Count);
         foreach (var task in allTasks)
         {
-            var line = $"\"{task.CronExpression}\", \"{task.TaskName}\", \"{task.Description}\", \"{task.LastRunTime:dd MMM yyyy HH:mm:ss}\", \"{task.Status}\", \"{task.WebService}\", \"{task.DayOffset}\"";
+            var line = $"\"{task.TaskId}\", \"{task.CronExpression}\", \"{task.TaskName}\", \"{task.Description}\", \"{task.LastRunTime:dd MMM yyyy HH:mm:ss}\", \"{task.Status}\", \"{task.WebService}\", \"{task.DayOffset}\"";
             lines.Add(line);
         }
 
