@@ -1,4 +1,5 @@
 <Solution>
-  <Project Path="CronosTask.Common/CronosTask.Common.csproj" />
-  <Project Path="CronosTask.Scheduler/CronosTask.Scheduler.csproj" />
+  <Project Path="TaslWorkflow.Common/TaskWorkflow.Common.csproj" />
+  <Project Path="TaslWorkflow.Scheduler/TaskWorkflow.Scheduler.csproj" />
+  <Project Path="TaskWorkflow.Api/TaskWorkflow.Api.csproj" />
 </Solution>

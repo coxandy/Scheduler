@@ -1,15 +1,12 @@
-using CronosTask.Common.Helpers;
-using CronosTask.Scheduler.Interfaces;
-using CronosTask.Scheduler.Services;
 using Serilog;
 
-namespace CronosTask.Scheduler;
+namespace TaskWorkflow.Api;
 
 public class Program
 {
     public static void Main(string[] args)
     {
-        var logPath = Path.Combine(AppContext.BaseDirectory, "logs", "ticketapi-.log");
+        var logPath = Path.Combine(AppContext.BaseDirectory, "logs", "taskworkflow-.log");
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
@@ -20,9 +17,8 @@ public class Program
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
 
-        var builder = Host.CreateApplicationBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 
-        // Configure environment-specific settings
         builder.Configuration
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -31,17 +27,16 @@ public class Program
 
         Log.Information("Starting in {Environment} environment", builder.Environment.EnvironmentName);
 
-        var webServers = builder.Configuration.GetSection("Scheduler:WebServers").Get<List<string>>() ?? new();
-        var port = builder.Configuration.GetValue<int>("Scheduler:Port");
-        UriHelper.Initialize(webServers, port);
-
         builder.Services.AddSerilog();
         builder.Services.AddWindowsService();
-        builder.Services.AddHttpClient();
-        builder.Services.AddTransient<ITaskExecutionService,TaskExecutionService>();
-        builder.Services.AddHostedService<CronosTaskSchedulerService>();
-        var host = builder.Build();
+        builder.Services.AddControllers();
 
-        host.Run();
+        builder.WebHost.UseUrls("https://localhost:5010");
+
+        var app = builder.Build();
+
+        app.MapControllers();
+
+        app.Run();
     }
 }

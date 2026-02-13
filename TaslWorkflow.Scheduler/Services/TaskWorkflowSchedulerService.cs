@@ -1,17 +1,17 @@
-using CronosTask.Common.Models;
-using CronosTask.Common.Helpers;
-using CronosTask.Scheduler.Interfaces;
+using TaskWorkflow.Common.Models;
+using TaskWorkflow.Common.Helpers;
+using TaskWorkflow.Scheduler.Interfaces;
 using Serilog;
 
-namespace CronosTask.Scheduler.Services;
+namespace TaskWorkflow.Scheduler.Services;
 
-public class CronosTaskSchedulerService : BackgroundService
+public class TaskWorkflowSchedulerService : BackgroundService
 {
     private readonly IConfiguration _config;
     private readonly SemaphoreSlim _triggerSemaphore;
     private readonly ITaskExecutionService _taskExecutionService;
 
-    public CronosTaskSchedulerService(IConfiguration congig, ITaskExecutionService taskExecutionService)
+    public TaskWorkflowSchedulerService(IConfiguration congig, ITaskExecutionService taskExecutionService)
     {
         _config = congig;
         _taskExecutionService = taskExecutionService;
@@ -24,7 +24,7 @@ public class CronosTaskSchedulerService : BackgroundService
         bool ShowOnce = true;
         while (!stoppingToken.IsCancellationRequested)
         {
-            var scheduledTasks = await CommonFileHelper.ReadCronosTaskScheduleAsync();
+            var scheduledTasks = await CommonFileHelper.ReadTaskWorkflowScheduleAsync();
             if (ShowOnce)
             {
                 await ConsoleDisplay(scheduledTasks);
@@ -66,7 +66,7 @@ public class CronosTaskSchedulerService : BackgroundService
     {
         Log.Information("'{TaskName}' using Cron: '{CronExpression}' has been triggered", scheduledTask.TaskName, scheduledTask.CronExpression);
         scheduledTask.LastRunTime = DateTime.Now;
-        await CommonFileHelper.WriteCronosTaskScheduleAsync(scheduledTask);
+        await CommonFileHelper.WriteTaskWorkflowScheduleAsync(scheduledTask);
         await _taskExecutionService.ExecuteTask(scheduledTask);
         return true;
     }

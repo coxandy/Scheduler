@@ -1,10 +1,10 @@
 using System.Text;
 using System.Text.Json;
-using CronosTask.Common.Models;
-using CronosTask.Scheduler.Interfaces;
+using TaskWorkflow.Common.Models;
+using TaskWorkflow.Scheduler.Interfaces;
 using Serilog;
 
-namespace CronosTask.Scheduler.Services;
+namespace TaskWorkflow.Scheduler.Services;
 
 public class TaskExecutionService : ITaskExecutionService
 {
@@ -19,7 +19,12 @@ public class TaskExecutionService : ITaskExecutionService
 
     public async Task ExecuteTask(ScheduledTask scheduledTask)
     {
-        string json = JsonSerializer.Serialize(scheduledTask);
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.Instance = scheduledTask;
+        taskInstance.dtEffective = DateTime.Today.AddDays(scheduledTask.DayOffset);
+        taskInstance.IsManual=false;
+        taskInstance.Status= Common.Models.Enums.eTaskStatus.ReadyToRun;
+        string json = JsonSerializer.Serialize(taskInstance);
         await PostScheduledTask(json, scheduledTask.WebService);
     }
 

@@ -1,8 +1,8 @@
 using Cronos;
-using CronosTask.Common.Models;
+using TaskWorkflow.Common.Models;
 using Serilog;
 
-namespace CronosTask.Common.Helpers;
+namespace TaskWorkflow.Common.Helpers;
 
 public static class CronosHelper
 {

@@ -1,15 +1,15 @@
-# CronosTask Scheduler
+# TaskWorkflow Scheduler
 
 A .NET 10 background service that executes scheduled tasks based on cron expressions, using the [Cronos](https://github.com/HangfireIO/Cronos) library.
 
 ## Projects
 
-- **CronosTask.Scheduler** - Worker service that monitors and triggers scheduled tasks. Runs as a Windows service or console application.
-- **CronosTask.Common** - Shared library containing models, cron evaluation helpers, and CSV file I/O.
+- **TaskWorkflow.Scheduler** - Worker service that monitors and triggers scheduled tasks. Runs as a Windows service or console application.
+- **TaskWorkflow.Common** - Shared library containing models, cron evaluation helpers, and CSV file I/O.
 
 ## Configuration
 
-Task schedules are defined in `CronosTask.Scheduler/RunData/CronSchedule.csv` using the format:
+Task schedules are defined in `TaskWorkflow.Scheduler/RunData/CronSchedule.csv` using the format:
 
 ```
 "<cron>", "<TaskName>", "<Description>", "<LastRunTime>", "<Status>", "<WebService>"
@@ -24,13 +24,13 @@ Application settings are in `appsettings.json` (with per-environment overrides f
 ## Running
 
 ```bash
-dotnet run --project CronosTask.Scheduler
+dotnet run --project TaskWorkflow.Scheduler
 ```
 
 To specify an environment:
 
 ```bash
-dotnet run --project CronosTask.Scheduler --environment Development
+dotnet run --project TaskWorkflow.Scheduler --environment Development
 ```
 
 ## Logging

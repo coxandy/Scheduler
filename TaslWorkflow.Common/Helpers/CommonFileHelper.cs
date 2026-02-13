@@ -1,11 +1,11 @@
-using CronosTask.Common.Models;
+using TaskWorkflow.Common.Models;
 
-namespace CronosTask.Common.Helpers;
+namespace TaskWorkflow.Common.Helpers;
 
 public static class CommonFileHelper
 {
     
-    public static async Task<List<ScheduledTask>> ReadCronosTaskScheduleAsync()
+    public static async Task<List<ScheduledTask>> ReadTaskWorkflowScheduleAsync()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "RunData", "CronSchedule.csv");
         var rows = ReadDelimitedFile(filePath, ',');
@@ -30,10 +30,10 @@ public static class CommonFileHelper
         return scheduledTasks;
     }
 
-    public static async Task WriteCronosTaskScheduleAsync(ScheduledTask updatedTask)
+    public static async Task WriteTaskWorkflowScheduleAsync(ScheduledTask updatedTask)
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "RunData", "CronSchedule.csv");
-        var allTasks = await ReadCronosTaskScheduleAsync();
+        var allTasks = await ReadTaskWorkflowScheduleAsync();
 
         var target = allTasks.FirstOrDefault(t => t.TaskName == updatedTask.TaskName);
         if (target != null)

@@ -1,4 +1,4 @@
-namespace CronosTask.Common.Models;
+namespace TaskWorkflow.Common.Models;
 
 public class ScheduledTask
 {

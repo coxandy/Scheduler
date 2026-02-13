@@ -1,6 +1,6 @@
-using CronosTask.Common.Models;
+using TaskWorkflow.Common.Models;
 
-namespace CronosTask.Scheduler.Interfaces;
+namespace TaskWorkflow.Scheduler.Interfaces;
 
 public interface ITaskExecutionService
 {
