@@ -1,3 +1,5 @@
+using CronosTask.Common.Helpers;
+using CronosTask.Scheduler.Interfaces;
 using CronosTask.Scheduler.Services;
 using Serilog;
 
@@ -20,7 +22,6 @@ public class Program
 
         var builder = Host.CreateApplicationBuilder(args);
 
-
         // Configure environment-specific settings
         builder.Configuration
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -30,11 +31,17 @@ public class Program
 
         Log.Information("Starting in {Environment} environment", builder.Environment.EnvironmentName);
 
+        var webServers = builder.Configuration.GetSection("Scheduler:WebServers").Get<List<string>>() ?? new();
+        var port = builder.Configuration.GetValue<int>("Scheduler:Port");
+        UriHelper.Initialize(webServers, port);
+
         builder.Services.AddSerilog();
         builder.Services.AddWindowsService();
+        builder.Services.AddHttpClient();
+        builder.Services.AddTransient<ITaskExecutionService,TaskExecutionService>();
         builder.Services.AddHostedService<CronosTaskSchedulerService>();
-
         var host = builder.Build();
+
         host.Run();
     }
 }

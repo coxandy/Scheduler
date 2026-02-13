@@ -22,7 +22,8 @@ public static class CommonFileHelper
                     Description = fields[2],
                     LastRunTime = Convert.ToDateTime(fields[3]),
                     Status = fields[4],
-                    WebService = fields[5]
+                    WebService = fields[5],
+                    DayOffset= Convert.ToInt32(fields[6])
                 });
             }
         }
@@ -43,7 +44,7 @@ public static class CommonFileHelper
         var lines = new List<string>(allTasks.Count);
         foreach (var task in allTasks)
         {
-            var line = $"\"{task.CronExpression}\", \"{task.TaskName}\", \"{task.Description}\", \"{task.LastRunTime:dd MMM yyyy HH:mm:ss}\", \"{task.Status}\", \"{task.WebService}\"";
+            var line = $"\"{task.CronExpression}\", \"{task.TaskName}\", \"{task.Description}\", \"{task.LastRunTime:dd MMM yyyy HH:mm:ss}\", \"{task.Status}\", \"{task.WebService}\", \"{task.DayOffset}\"";
             lines.Add(line);
         }
 

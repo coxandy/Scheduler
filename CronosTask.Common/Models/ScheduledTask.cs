@@ -8,4 +8,5 @@ public class ScheduledTask
     public DateTime LastRunTime { get; set; }
     public string Status { get; set; } = string.Empty;
     public string WebService { get; set; } = string.Empty;
+    public int DayOffset { get; set; }
 }

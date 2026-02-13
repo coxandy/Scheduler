@@ -1,6 +1,6 @@
-using Cronos;
 using CronosTask.Common.Models;
 using CronosTask.Common.Helpers;
+using CronosTask.Scheduler.Interfaces;
 using Serilog;
 
 namespace CronosTask.Scheduler.Services;
@@ -9,10 +9,12 @@ public class CronosTaskSchedulerService : BackgroundService
 {
     private readonly IConfiguration _config;
     private readonly SemaphoreSlim _triggerSemaphore;
+    private readonly ITaskExecutionService _taskExecutionService;
 
-    public CronosTaskSchedulerService(IConfiguration congig)
+    public CronosTaskSchedulerService(IConfiguration congig, ITaskExecutionService taskExecutionService)
     {
         _config = congig;
+        _taskExecutionService = taskExecutionService;
         var maxConcurrentTasks = _config.GetValue<int>("Scheduler:MaxConcurrentTasks", 3);
         _triggerSemaphore = new SemaphoreSlim(maxConcurrentTasks);
     }
@@ -29,9 +31,10 @@ public class CronosTaskSchedulerService : BackgroundService
                 ShowOnce = false;
             }
 
-            //determine which tasks are ready to trigger
+            // determine which tasks are ready to trigger
             var tasksToTrigger = await CronosHelper.GetTasksReadyToTriggerAsync(scheduledTasks);
 
+            // run those tasks that are scheduled
             var triggerTasks = tasksToTrigger.Select(async scheduledTask =>
             {
                 await _triggerSemaphore.WaitAsync(stoppingToken);
@@ -51,7 +54,7 @@ public class CronosTaskSchedulerService : BackgroundService
         }
     }
 
-    private static async Task ConsoleDisplay(List<ScheduledTask> scheduledTasks)
+    private async Task ConsoleDisplay(List<ScheduledTask> scheduledTasks)
     {
         foreach (var scheduledTask in scheduledTasks)
         {
@@ -59,14 +62,12 @@ public class CronosTaskSchedulerService : BackgroundService
         }
     }
 
-    private static async Task<bool> TriggerAsync(ScheduledTask scheduledTask)
+    private async Task<bool> TriggerAsync(ScheduledTask scheduledTask)
     {
         Log.Information("'{TaskName}' using Cron: '{CronExpression}' has been triggered", scheduledTask.TaskName, scheduledTask.CronExpression);
-
         scheduledTask.LastRunTime = DateTime.Now;
-
         await CommonFileHelper.WriteCronosTaskScheduleAsync(scheduledTask);
-
+        await _taskExecutionService.ExecuteTask(scheduledTask);
         return true;
     }
 }
