@@ -1,0 +1,8 @@
+"*/5 * * * *", "Task1", "Task1 every 5 mins", "13 Feb 2026 14:23:34", "Completed", "WebService1"
+"*/10 * * * *", "Task2", "Task2 every 10 mins",  "13 Feb 2026 09:23:08", "Completed", "WebService1"
+"*/20 * * * *", "Task3", "Task3 every 20 mins",  "13 Feb 2026 09:47:17", "Completed", "WebService1"
+"*/15 * * * *", "Task4", "Task4 every 15 mins",  "13 Feb 2026 10:28:51", "Completed", "WebService1"
+"30 12,13 * * *", "Task5", "Task5 half past 12pm and 1pm",  "13 Feb 2026 10:28:51", "Completed", "WebService1"
+"15,45 12 * * *", "Task6", "Task6 at 12:15 and 12:45",  "13 Feb 2026 10:28:51", "Completed", "WebService1"
+"30,37 12,15 * * *", "Task7", "Task7 Half past 11am and 3pm",  "13 Feb 2026 10:28:51", "Completed", "WebService1"
+"12,37 12,13,14,15 * * *", "Task8", "Task8 12 minutes past 12,13,14,15",  "13 Feb 2026 10:28:51", "Completed", "WebService1"

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CronosTask.Common/CronosTask.Common.csproj" />
+  <Project Path="CronosTask.Scheduler/CronosTask.Scheduler.csproj" />
+</Solution>
