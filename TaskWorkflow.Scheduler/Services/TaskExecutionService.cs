@@ -22,7 +22,7 @@ public class TaskExecutionService : ITaskExecutionService
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.RunId = Guid.CreateVersion7().ToString();
         taskInstance.Instance = scheduledTask;
-        taskInstance.dtEffective = DateTime.Today.AddDays(scheduledTask.DayOffset);
+        taskInstance.EffectiveDate = DateTime.Today.AddDays(scheduledTask.DayOffset);
         taskInstance.IsManual = false;
         taskInstance.Status= Common.Models.Enums.eTaskStatus.ReadyToRun;
         string json = JsonSerializer.Serialize(taskInstance);

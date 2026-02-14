@@ -24,7 +24,7 @@ public class TaskExecutionControllerTests
         {
             RunId = Guid.NewGuid().ToString(),
             Status = eTaskStatus.ReadyToRun,
-            dtEffective = DateTime.Today,
+            EffectiveDate = DateTime.Today,
             IsManual = false,
             Instance = new ScheduledTask
             {

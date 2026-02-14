@@ -18,7 +18,9 @@ public class TaskExecutionController : ControllerBase
     public IActionResult ExecuteTask([FromBody] TaskInstance taskInstance)
     {
         Log.Information("Received task '{TaskName}' for WebService '{WebService}'", taskInstance.Instance.TaskName, taskInstance.Instance.WebService);
-
+        Log.Information($"RunId: '{taskInstance.RunId}'");
+        Log.Information($"EffectiveDate: '{taskInstance.EffectiveDate}'");
+        Log.Information($"IsManual: '{taskInstance.IsManual}'");
         return Ok(new { message = $"Task '{taskInstance.Instance.TaskName}' received successfully" });
     }
 }
