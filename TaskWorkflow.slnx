@@ -7,4 +7,5 @@
   <Project Path="TaskWorkflow.Api/TaskWorkflow.Api.csproj" />
   <Project Path="TaskWorkflow.UnitTests/TaskWorkflow.UnitTests.csproj" />
   <Project Path="TaskWorkflow.TestHarness/TaskWorkflow.TestHarness.csproj" />
+  <Project Path="TaskWorkflow.TaskFactory/TaskWorkflow.TaskFactory.csproj" />
 </Solution>

@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TaskWorkflow.Api\TaskWorkflow.Api.csproj" />
     <ProjectReference Include="..\TaskWorkflow.Common\TaskWorkflow.Common.csproj" />
+    <ProjectReference Include="..\TaskWorkflow.TaskFactory\TaskWorkflow.TaskFactory.csproj" />
   </ItemGroup>
 
 </Project>
