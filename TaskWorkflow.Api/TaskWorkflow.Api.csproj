@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CronosTask.Common\TaskWorkflow.Common.csproj" />
-    <ProjectReference Include="..\TaslWorkflow.Common\TaskWorkflow.Common.csproj" />
+    <ProjectReference Include="..\TaskWorkflow.Common\TaskWorkflow.Common.csproj" />
+    <ProjectReference Include="..\TaskWorkflow.Common\TaskWorkflow.Common.csproj" />
   </ItemGroup>
 
 </Project>

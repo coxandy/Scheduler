@@ -9,7 +9,7 @@ A .NET 10 background service that executes scheduled tasks based on cron express
 
 ## Configuration
 
-Task schedules are defined in `TaskWorkflow.Scheduler/RunData/CronSchedule.csv` using the format:
+Task schedules are defined in `TaskWorkflow.Scheduler/TestRunData/CronSchedule.csv` using the format:
 
 ```
 "<cron>", "<TaskName>", "<Description>", "<LastRunTime>", "<Status>", "<WebService>"

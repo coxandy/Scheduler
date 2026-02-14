@@ -14,7 +14,7 @@ public class TaskExecutionController : ControllerBase
         _config = config;
     }
     
-    [HttpPost]
+    [HttpPost("ExecuteTask")]
     public IActionResult ExecuteTask([FromBody] TaskInstance taskInstance)
     {
         Log.Information("Received task '{TaskName}' for WebService '{WebService}'", taskInstance.Instance.TaskName, taskInstance.Instance.WebService);

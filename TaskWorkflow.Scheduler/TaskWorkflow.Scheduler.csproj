@@ -18,14 +18,13 @@
   </ItemGroup>
 
   <ItemGroup>
-  <None Update="RunData\CronSchedule.csv">
+  <None Update="TestRunData\CronSchedule.csv">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   </None>
 </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CronosTask.Common\TaskWorkflow.Common.csproj" />
-    <ProjectReference Include="..\TaslWorkflow.Common\TaskWorkflow.Common.csproj" />
+    <ProjectReference Include="..\TaskWorkflow.Common\TaskWorkflow.Common.csproj" />
   </ItemGroup>
 
 </Project>

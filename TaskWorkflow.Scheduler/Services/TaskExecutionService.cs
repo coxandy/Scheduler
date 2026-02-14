@@ -20,9 +20,10 @@ public class TaskExecutionService : ITaskExecutionService
     public async Task ExecuteTask(ScheduledTask scheduledTask)
     {
         TaskInstance taskInstance = new TaskInstance();
+        taskInstance.RunId = Guid.CreateVersion7().ToString();
         taskInstance.Instance = scheduledTask;
         taskInstance.dtEffective = DateTime.Today.AddDays(scheduledTask.DayOffset);
-        taskInstance.IsManual=false;
+        taskInstance.IsManual = false;
         taskInstance.Status= Common.Models.Enums.eTaskStatus.ReadyToRun;
         string json = JsonSerializer.Serialize(taskInstance);
         await PostScheduledTask(json, scheduledTask.WebService);
@@ -37,8 +38,7 @@ public class TaskExecutionService : ITaskExecutionService
         for (int attempt = 0; attempt < serverCount; attempt++)
         {
             int serverIndex = (primaryIndex + attempt) % serverCount;
-            string url = UriHelper.GetUriForServer(serverIndex);
-
+            string url = $"{UriHelper.GetUriForServer(serverIndex)}/TaskExecution/ExecuteTask";
 
             Log.Information($"Posting task '{webService}' to {url} (attempt {attempt + 1} of {serverCount})");
             var response = await Post(json, url, webService, attempt + 1, serverCount);

@@ -1,5 +1,10 @@
 <Solution>
-  <Project Path="TaslWorkflow.Common/TaskWorkflow.Common.csproj" />
-  <Project Path="TaslWorkflow.Scheduler/TaskWorkflow.Scheduler.csproj" />
+  <Properties>
+    <Property Name="StartupProject" Value="TaskWorkflow.TestHarness/TaskWorkflow.TestHarness.csproj" />
+  </Properties>
+  <Project Path="TaskWorkflow.Common/TaskWorkflow.Common.csproj" />
+  <Project Path="TaskWorkflow.Scheduler/TaskWorkflow.Scheduler.csproj" />
   <Project Path="TaskWorkflow.Api/TaskWorkflow.Api.csproj" />
+  <Project Path="TaskWorkflow.UnitTests/TaskWorkflow.UnitTests.csproj" />
+  <Project Path="TaskWorkflow.TestHarness/TaskWorkflow.TestHarness.csproj" />
 </Solution>

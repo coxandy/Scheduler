@@ -4,54 +4,6 @@ namespace TaskWorkflow.Common.Helpers;
 
 public static class CommonFileHelper
 {
-    
-    public static async Task<List<ScheduledTask>> ReadTaskWorkflowScheduleAsync()
-    {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "RunData", "CronSchedule.csv");
-        var rows = ReadDelimitedFile(filePath, ',');
-        var scheduledTasks = new List<ScheduledTask>(rows.Count);
-
-        foreach (var fields in rows)
-        {
-            if (fields.Length >= 5)
-            {
-                scheduledTasks.Add(new ScheduledTask
-                {
-                    TaskId = Convert.ToInt64(fields[0]),
-                    CronExpression = fields[1],
-                    TaskName = fields[2],
-                    Description = fields[3],
-                    LastRunTime = Convert.ToDateTime(fields[4]),
-                    Status = fields[5],
-                    WebService = fields[6],
-                    DayOffset= Convert.ToInt32(fields[7])
-                });
-            }
-        }
-        return scheduledTasks;
-    }
-
-    public static async Task WriteTaskWorkflowScheduleAsync(ScheduledTask updatedTask)
-    {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "RunData", "CronSchedule.csv");
-        var allTasks = await ReadTaskWorkflowScheduleAsync();
-
-        var target = allTasks.FirstOrDefault(t => t.TaskName == updatedTask.TaskName);
-        if (target != null)
-        {
-            target.LastRunTime = updatedTask.LastRunTime;
-        }
-
-        var lines = new List<string>(allTasks.Count);
-        foreach (var task in allTasks)
-        {
-            var line = $"\"{task.TaskId}\", \"{task.CronExpression}\", \"{task.TaskName}\", \"{task.Description}\", \"{task.LastRunTime:dd MMM yyyy HH:mm:ss}\", \"{task.Status}\", \"{task.WebService}\", \"{task.DayOffset}\"";
-            lines.Add(line);
-        }
-
-        await File.WriteAllLinesAsync(filePath, lines);
-    }
-
     public static List<string[]> ReadDelimitedFile(string filePath, char delimiter)
     {
         var content = File.ReadAllText(filePath);

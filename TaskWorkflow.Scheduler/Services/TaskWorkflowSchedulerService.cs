@@ -1,6 +1,7 @@
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Helpers;
 using TaskWorkflow.Scheduler.Interfaces;
+using TaskWorkflow.Scheduler.TestRunData;
 using Serilog;
 
 namespace TaskWorkflow.Scheduler.Services;
@@ -24,7 +25,7 @@ public class TaskWorkflowSchedulerService : BackgroundService
         bool ShowOnce = true;
         while (!stoppingToken.IsCancellationRequested)
         {
-            var scheduledTasks = await CommonFileHelper.ReadTaskWorkflowScheduleAsync();
+            var scheduledTasks = await TestDataHelper.GetTestTasks(); //needs to use database
             if (ShowOnce)
             {
                 await ConsoleDisplay(scheduledTasks);
@@ -66,7 +67,7 @@ public class TaskWorkflowSchedulerService : BackgroundService
     {
         Log.Information("'{TaskName}' using Cron: '{CronExpression}' has been triggered", scheduledTask.TaskName, scheduledTask.CronExpression);
         scheduledTask.LastRunTime = DateTime.Now;
-        await CommonFileHelper.WriteTaskWorkflowScheduleAsync(scheduledTask);
+        await TestDataHelper.WriteTaskWorkflowScheduleAsync(scheduledTask);
         await _taskExecutionService.ExecuteTask(scheduledTask);
         return true;
     }

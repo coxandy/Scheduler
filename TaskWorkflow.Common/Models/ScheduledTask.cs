@@ -10,4 +10,6 @@ public class ScheduledTask
     public string Status { get; set; } = string.Empty;
     public string WebService { get; set; } = string.Empty;
     public int DayOffset { get; set; }
+    public long TaskJsonDefinitionId { get; set; }
+    
 }
