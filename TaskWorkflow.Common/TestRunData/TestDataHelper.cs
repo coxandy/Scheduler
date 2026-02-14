@@ -1,7 +1,7 @@
 using TaskWorkflow.Common.Helpers;
 using TaskWorkflow.Common.Models;
 
-namespace TaskWorkflow.Scheduler.TestRunData;
+namespace TaskWorkflow.Common.TestRunData;
 
 public static class TestDataHelper
 {
@@ -49,17 +49,18 @@ public static class TestDataHelper
                 scheduledTasks.Add(new ScheduledTask
                 {
                     TaskId = Convert.ToInt64(fields[0]),
-                    CronExpression = fields[1],
-                    TaskName = fields[2],
-                    Description = fields[3],
-                    LastRunTime = Convert.ToDateTime(fields[4]),
-                    Status = fields[5],
-                    WebService = fields[6],
-                    DayOffset= Convert.ToInt32(fields[7])
+                    IsActive = (Convert.ToInt16(fields[1]) == 1) ? true : false,
+                    CronExpression = fields[2],
+                    TaskName = fields[3],
+                    Description = fields[4],
+                    LastRunTime = Convert.ToDateTime(fields[5]),
+                    Status = fields[6],
+                    WebService = fields[7],
+                    DayOffset= Convert.ToInt32(fields[8])
                 });
             }
         }
-        return scheduledTasks;
+        return scheduledTasks.Where(x => x.IsActive == true).ToList();
     }
 
     public static async Task WriteTaskWorkflowScheduleAsync(ScheduledTask updatedTask)
@@ -76,7 +77,7 @@ public static class TestDataHelper
         var lines = new List<string>(allTasks.Count);
         foreach (var task in allTasks)
         {
-            var line = $"\"{task.TaskId}\", \"{task.CronExpression}\", \"{task.TaskName}\", \"{task.Description}\", \"{task.LastRunTime:dd MMM yyyy HH:mm:ss}\", \"{task.Status}\", \"{task.WebService}\", \"{task.DayOffset}\", \"{task.TaskJsonDefinitionId}\"";
+            var line = $"\"{task.TaskId}\", \"{Convert.ToInt16(task.IsActive)}\", \"{task.CronExpression}\", \"{task.TaskName}\", \"{task.Description}\", \"{task.LastRunTime:dd MMM yyyy HH:mm:ss}\", \"{task.Status}\", \"{task.WebService}\", \"{task.DayOffset}\", \"{task.TaskJsonDefinitionId}\"";
             lines.Add(line);
         }
 

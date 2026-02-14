@@ -1,6 +1,6 @@
 <Solution>
   <Properties>
-    <Property Name="StartupProject" Value="TaskWorkflow.TestHarness/TaskWorkflow.TestHarness.csproj" />
+    <Property Name="StartupProject" Value="TaskWorkflow.Api/TaskWorkflow.Api.csproj" />
   </Properties>
   <Project Path="TaskWorkflow.Common/TaskWorkflow.Common.csproj" />
   <Project Path="TaskWorkflow.Scheduler/TaskWorkflow.Scheduler.csproj" />

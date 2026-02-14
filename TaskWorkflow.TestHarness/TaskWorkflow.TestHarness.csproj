@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\TaskWorkflow.Scheduler\TestRunData\CronSchedule.csv" Link="TestRunData\CronSchedule.csv">
+    <Content Include="..\TaskWorkflow.Common\TestRunData\CronSchedule.csv" Link="TestRunData\CronSchedule.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

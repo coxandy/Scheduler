@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using TaskWorkflow.Scheduler.Interfaces;
 using TaskWorkflow.Scheduler.Services;
-using TaskWorkflow.Scheduler.TestRunData;
+using TaskWorkflow.Common.TestRunData;
 
 namespace TaskWorkflow.TestHarness;
 
@@ -25,7 +27,10 @@ public class Program
         var port = configuration.GetValue<int>("Scheduler:Port");
         UriHelper.Initialize(webServers, port);
 
+        var environmentName = configuration.GetValue<string>("Environment") ?? "Development";
+
         var services = new ServiceCollection();
+        services.AddSingleton<IHostEnvironment>(new HostingEnvironment { EnvironmentName = environmentName });
         services.AddHttpClient();
         services.AddTransient<ITaskExecutionService, TaskExecutionService>();
         var serviceProvider = services.BuildServiceProvider();

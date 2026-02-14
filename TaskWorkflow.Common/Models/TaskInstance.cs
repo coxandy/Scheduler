@@ -9,4 +9,5 @@ public class TaskInstance
     public eTaskStatus Status { get; set; }    
     public DateTime EffectiveDate { get; set; }
     public bool IsManual { get; set; }
+    public string? EnvironmentName { get; set; }
 }

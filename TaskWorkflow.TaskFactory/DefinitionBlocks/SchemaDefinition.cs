@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using TaskWorkflow.TaskFactory.Interfaces;
+using TaskWorkflow.Common.Models;
 
 namespace TaskWorkflow.TaskFactory.DefinitionBlocks;
 
@@ -17,8 +18,8 @@ public class SchemaDefinition : IDefinition
     [JsonPropertyName("author")]
     public string Author { get; set; }
 
-    public async Task RunDefinitionBlock()
+    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance)
     {
-        
+        Console.Write($"RunId: {taskInstance.RunId}  Running {GetType().Name}..");
     }
 }

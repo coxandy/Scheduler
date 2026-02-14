@@ -1,7 +1,9 @@
 using System.Text.Json.Serialization;
 using TaskWorkflow.TaskFactory.Interfaces;
+using TaskWorkflow.Common.Models;
 
 namespace TaskWorkflow.TaskFactory.DefinitionBlocks;
+
 public class VariableDefinition : IDefinition
 {
     [JsonPropertyName("id")]
@@ -16,8 +18,8 @@ public class VariableDefinition : IDefinition
     [JsonPropertyName("isActive")]
     public bool IsActive { get; set; }
 
-    public async Task RunDefinitionBlock()
+    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance)
     {
-        
+        Console.Write($"RunId: {taskInstance.RunId}  Running {GetType().Name}..");
     }
 }

@@ -1,6 +1,8 @@
+using TaskWorkflow.Common.Models;
+
 namespace TaskWorkflow.TaskFactory.Interfaces;
 
 public interface IDefinition
 {
-    Task RunDefinitionBlock();
+    Task RunDefinitionBlockAsync(TaskInstance taskInstance);
 }

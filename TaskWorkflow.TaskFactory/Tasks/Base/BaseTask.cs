@@ -3,7 +3,7 @@ using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
 
-namespace TaskWorkflow.TaskFactory.Tasks;
+namespace TaskWorkflow.TaskFactory.Tasks.Base;
 
 public abstract class BaseTask
 {
@@ -15,16 +15,18 @@ public abstract class BaseTask
         { "SchemaDefinition", typeof(SchemaDefinition) }
     };
 
-    private string _json;
-    private TaskInstance _taskInstance;
-    public List<IDefinition> DefinitionBlocks;
+    private readonly string _json;
+
+    //protected properties
+    protected TaskInstance Instance;
+    protected List<IDefinition> DefinitionBlocks;
 
     public abstract Task Run();
 
     public BaseTask(string json, TaskInstance taskInstance)
     {
         _json = json;
-        _taskInstance = taskInstance;
+        Instance = taskInstance;
         DefinitionBlocks = DeserializeDefinitionBlocks(json);
     }
 

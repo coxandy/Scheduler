@@ -17,13 +17,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-  <None Update="TestRunData\CronSchedule.csv">
-    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-  </None>
-</ItemGroup>
-
-  <ItemGroup>
+<ItemGroup>
     <ProjectReference Include="..\TaskWorkflow.Common\TaskWorkflow.Common.csproj" />
   </ItemGroup>
 

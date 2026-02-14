@@ -1,6 +1,6 @@
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
-using TaskWorkflow.TaskFactory.Tasks;
+using TaskWorkflow.TaskFactory.Tasks.Base;
 using Xunit;
 
 namespace TaskWorkflow.UnitTests.TaskFactory;

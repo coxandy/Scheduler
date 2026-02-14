@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "TaskWorkflow.Api",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/TaskWorkflow.Api/bin/Debug/net10.0/TaskWorkflow.Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/TaskWorkflow.Api",
+      "stopAtEntry": false,
+      "justMyCode": false,
+      "requireExactSource": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
+}

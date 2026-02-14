@@ -1,7 +1,7 @@
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Helpers;
 using TaskWorkflow.Scheduler.Interfaces;
-using TaskWorkflow.Scheduler.TestRunData;
+using TaskWorkflow.Common.TestRunData;
 using Serilog;
 
 namespace TaskWorkflow.Scheduler.Services;

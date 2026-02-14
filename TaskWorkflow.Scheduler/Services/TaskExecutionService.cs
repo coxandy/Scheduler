@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Hosting;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Scheduler.Interfaces;
 using Serilog;
@@ -9,11 +10,13 @@ namespace TaskWorkflow.Scheduler.Services;
 public class TaskExecutionService : ITaskExecutionService
 {
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IHostEnvironment _hostingEnvironment;
     private readonly HttpClient _client;
 
-    public TaskExecutionService(IHttpClientFactory httpClientFactory)
+    public TaskExecutionService(IHttpClientFactory httpClientFactory, IHostEnvironment hostingEnvironment)
     {
         _httpClientFactory = httpClientFactory;
+        _hostingEnvironment = hostingEnvironment;
         _client = _httpClientFactory.CreateClient();
     }
 
@@ -25,6 +28,7 @@ public class TaskExecutionService : ITaskExecutionService
         taskInstance.EffectiveDate = DateTime.Today.AddDays(scheduledTask.DayOffset);
         taskInstance.IsManual = false;
         taskInstance.Status= Common.Models.Enums.eTaskStatus.ReadyToRun;
+        taskInstance.EnvironmentName = _hostingEnvironment.EnvironmentName;
         string json = JsonSerializer.Serialize(taskInstance);
         await PostScheduledTask(json, scheduledTask.WebService);
     }
