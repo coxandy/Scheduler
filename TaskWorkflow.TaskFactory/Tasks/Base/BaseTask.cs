@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TaskWorkflow.Common.Models;
-using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
 
@@ -29,13 +28,15 @@ public abstract class BaseTask
     protected TaskInstance Instance;
     protected List<IDefinition> DefinitionBlocks;
     protected Dictionary<string, object> Variables { get; set; } = new();
+    protected IServiceProvider ServiceProvider { get; set; }
 
     public abstract Task Run();
 
-    public BaseTask(string json, TaskInstance taskInstance)
+    public BaseTask(string json, TaskInstance taskInstance, IServiceProvider serviceProvider)
     {
         _json = json;
         this.Instance = taskInstance;
+        this.ServiceProvider = serviceProvider;
         WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(_json);
         
         //====================================================================================

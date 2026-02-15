@@ -61,7 +61,6 @@ public class DeserializeDefinitionBlocksTests
     public void ValidJson_ReturnsThreeDefinitions()
     {
         var result = ParseAndDeserialize(GetValidJson());
-
         Assert.Equal(3, result.Count);
     }
 
@@ -69,7 +68,6 @@ public class DeserializeDefinitionBlocksTests
     public void ValidJson_ReturnsCorrectTypes()
     {
         var result = ParseAndDeserialize(GetValidJson());
-
         Assert.IsType<VariableDefinition>(result[0]);
         Assert.IsType<ClassDefinition>(result[1]);
         Assert.IsType<SchemaDefinition>(result[2]);
@@ -87,6 +85,12 @@ public class DeserializeDefinitionBlocksTests
         Assert.Equal("<@@Test3@@>", variable.Variables.Keys.ElementAt(2));
         Assert.Equal("<@@Test4@@>", variable.Variables.Keys.ElementAt(3));
         
+        Assert.Equal("13", variable.Variables.Values.ElementAt(0).ToString());
+        Assert.Equal("15", variable.Variables.Values.ElementAt(1).ToString());
+        Assert.Equal("andy", variable.Variables.Values.ElementAt(2).ToString());
+        Assert.Equal("58", variable.Variables.Values.ElementAt(3).ToString());
+        
+
         Assert.True(variable.IsActive);
     }
 

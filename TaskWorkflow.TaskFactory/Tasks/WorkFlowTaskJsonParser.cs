@@ -189,12 +189,14 @@ public class WorkflowTaskJsonParser
         {
             foreach(var variable in variablesToReplace)
             {
-                json = json.Replace(variable.Key.ToString(), variable.Value.ToString());
+                if (variable.Value != null) 
+                {
+                    json = JsonParsingHelper.ReplaceVariablesInJson(json, variable.Key.ToString(), variable.Value.ToString());
+                }
             }
         }
         return json;
     }
-
 
     public List<IDefinition> DeserializeDefinitionBlocks(string json)
     {

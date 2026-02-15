@@ -43,11 +43,13 @@ public class TaskExecutionControllerTests
         var mockHostingEnvironment = new Mock<IHostEnvironment>();
         mockHostingEnvironment.Setup(h => h.EnvironmentName).Returns("Development");
 
+        var mockServiceProvider = new Mock<IServiceProvider>();
+
         var mockTaskObjectCreationService = new Mock<ITaskObjectCreationService>();
         mockTaskObjectCreationService.SetupAllProperties();
         mockTaskObjectCreationService
-            .Setup(s => s.CreateTaskObjectAsync())
-            .ReturnsAsync(() => new GenericWorkflowTask(_validJson, mockTaskObjectCreationService.Object.Instance));
+            .Setup(s => s.CreateTaskObjectAsync(It.IsAny<string>()))
+            .ReturnsAsync(() => new GenericWorkflowTask(_validJson, mockTaskObjectCreationService.Object.Instance, mockServiceProvider.Object));
 
         _controller = new TaskExecutionController(mockConfig.Object, mockHostingEnvironment.Object, mockTaskObjectCreationService.Object);
     }

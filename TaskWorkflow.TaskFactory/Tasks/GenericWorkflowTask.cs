@@ -5,7 +5,7 @@ namespace TaskWorkflow.TaskFactory.Tasks;
 
 public class GenericWorkflowTask: BaseTask
 {
-    public GenericWorkflowTask(string json, TaskInstance taskInstance): base(json, taskInstance)
+    public GenericWorkflowTask(string json, TaskInstance taskInstance, IServiceProvider serviceProvider): base(json, taskInstance, serviceProvider)
     {}
 
     public override async Task Run()
