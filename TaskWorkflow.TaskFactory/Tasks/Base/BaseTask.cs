@@ -1,5 +1,7 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using TaskWorkflow.Common.Models;
+using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
 
@@ -8,7 +10,13 @@ namespace TaskWorkflow.TaskFactory.Tasks.Base;
 public abstract class BaseTask
 {
 
-    private static readonly Dictionary<string, Type> _definitionBlockTypeMap = new()
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
+    private static readonly Dictionary<string, Type> _definitionBlockTypeMap = new(StringComparer.OrdinalIgnoreCase)
     {
         { "VariableDefinition", typeof(VariableDefinition) },
         { "ClassDefinition", typeof(ClassDefinition) },
@@ -20,57 +28,32 @@ public abstract class BaseTask
     //protected properties
     protected TaskInstance Instance;
     protected List<IDefinition> DefinitionBlocks;
+    protected Dictionary<string, object> Variables { get; set; } = new();
 
     public abstract Task Run();
 
     public BaseTask(string json, TaskInstance taskInstance)
     {
         _json = json;
-        Instance = taskInstance;
-        DefinitionBlocks = DeserializeDefinitionBlocks(json);
-    }
-
-
-    internal static List<IDefinition> DeserializeDefinitionBlocks(string json)
-    {
-        if (string.IsNullOrWhiteSpace(json))
-            throw new ArgumentException("JSON cannot be null or empty.", nameof(json));
-
-        JsonDocument document;
-        try
+        this.Instance = taskInstance;
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(_json);
+        
+        //====================================================================================
+        // VariableDefinition is exceptional because it has to be processed prior to the 
+        // Task Json being deserialized into definition blocks
+        // Verify Json format and return VariableDefintion if it exists
+        //====================================================================================
+        VariableDefinition VariableDefinitionBlock = JsonParser.VerifyJson();
+        if (VariableDefinitionBlock != null)
         {
-            document = JsonDocument.Parse(json);
-        }
-        catch (JsonException ex)
-        {
-            throw new FormatException($"Invalid JSON format: {ex.Message}", ex);
+            // Assign variables to class
+            this.Variables = VariableDefinitionBlock.Variables;
+
+            // Apply variable replacement to Json
+            _json = JsonParser.ApplyVariableReplacementsToJson(_json, VariableDefinitionBlock);
         }
 
-        using (document)
-        {
-            var root = document.RootElement;
-
-            if (root.ValueKind != JsonValueKind.Object)
-                throw new FormatException($"Expected a JSON object but got {root.ValueKind}.");
-
-            var definitions = new List<IDefinition>();
-
-            foreach (var property in root.EnumerateObject())
-            {
-                if (!_definitionBlockTypeMap.TryGetValue(property.Name, out var definitionType))
-                    throw new KeyNotFoundException($"Unknown definition block '{property.Name}'. Valid blocks: {string.Join(", ", _definitionBlockTypeMap.Keys)}");
-
-                var rawJson = property.Value.GetRawText();
-                var definition = JsonSerializer.Deserialize(rawJson, definitionType) as IDefinition
-                    ?? throw new FormatException($"Failed to deserialize '{property.Name}' into {definitionType.Name}.");
-
-                definitions.Add(definition);
-            }
-
-            if (definitions.Count == 0)
-                throw new FormatException("JSON contains no definition blocks.");
-
-            return definitions;
-        }
+        // Get final block definition
+        this.DefinitionBlocks = JsonParser.DeserializeDefinitionBlocks(_json);
     }
 }

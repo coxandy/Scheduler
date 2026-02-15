@@ -6,6 +6,8 @@ namespace TaskWorkflow.TaskFactory.DefinitionBlocks;
 
 public class SchemaDefinition : IDefinition
 {
+    public bool IsActive { get; set; }
+    
     [JsonPropertyName("version")]
     public string Version { get; set; }
 
