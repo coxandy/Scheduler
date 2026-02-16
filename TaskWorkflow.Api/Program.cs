@@ -1,5 +1,6 @@
 using TaskWorkflow.Api.Interfaces;
 using TaskWorkflow.Api.Services;
+using TaskWorkflow.Common.Helpers;
 using Serilog;
 
 namespace TaskWorkflow.Api;
@@ -39,6 +40,12 @@ public class Program
         builder.WebHost.UseUrls("https://localhost:5010");
 
         var app = builder.Build();
+
+        // Initialize static connection string helper from configuration
+        var connectionStrings = builder.Configuration.GetSection("ConnectionStrings")
+            .GetChildren()
+            .ToDictionary(x => x.Key, x => x.Value ?? string.Empty, StringComparer.OrdinalIgnoreCase);
+        ConnectionStringHelper.Initialize(connectionStrings);
 
         app.MapControllers();
 

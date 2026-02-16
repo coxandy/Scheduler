@@ -14,7 +14,7 @@ public class ExitDefinition: IDefinition
     public EmailOutcome Failure { get; set; }
 
 
-    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance)
+    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider)
     {
         Console.Write($"RunId: {taskInstance.RunId}  Running {GetType().Name}..");
     }

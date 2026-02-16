@@ -4,7 +4,7 @@ using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.Common.Models;
 using Xunit;
 
-namespace TaskWorkflow.UnitTests.TaskFactory;
+namespace TaskWorkflow.UnitTests.DefinitionBlockTests;
 
 public class VariableDefinitionTests
 {

@@ -12,7 +12,7 @@ public class VariableDefinition : IDefinition
 
     public Dictionary<string, object> Variables { get; set; } = new();
     
-    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance)
+    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider)
     {
         Console.Write($"RunId: {taskInstance.RunId}  Running {GetType().Name}..");
     }

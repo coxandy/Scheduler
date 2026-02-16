@@ -21,7 +21,7 @@ public class ClassDefinition: IDefinition
     [JsonPropertyName("parameters")]
     public List<string> Parameters { get; set; }
 
-    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance)
+    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider)
     {
         Console.Write($"RunId: {taskInstance.RunId}  Running {GetType().Name}..");
     }

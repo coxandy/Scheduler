@@ -15,7 +15,7 @@ public class WorkflowTaskJsonParser
     private  readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        Converters = { new JsonStringEnumConverter() }
+        Converters = { new JsonStringEnumConverter(), new SqlParameterJsonConverter() }
     };
 
     private readonly Dictionary<string, Type> _definitionBlockTypeMap = new(StringComparer.OrdinalIgnoreCase)
@@ -23,6 +23,7 @@ public class WorkflowTaskJsonParser
         { "VariableDefinition", typeof(VariableDefinition) },
         { "ClassDefinition", typeof(ClassDefinition) },
         { "SchemaDefinition", typeof(SchemaDefinition) },
+        { "DatasourceDefinition", typeof(DatasourceDefinition) },
         { "ExitDefinition", typeof(ExitDefinition) }
     };
 

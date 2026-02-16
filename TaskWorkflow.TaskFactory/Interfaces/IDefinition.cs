@@ -8,5 +8,5 @@ public interface IDefinition
     public bool IsActive { get; set; }
     public string BlockName { get; set; }
     public eOnError OnError { get; set; }
-    Task RunDefinitionBlockAsync(TaskInstance taskInstance);
+    Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider);
 }

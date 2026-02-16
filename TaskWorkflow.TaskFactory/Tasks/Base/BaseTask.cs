@@ -20,6 +20,7 @@ public abstract class BaseTask
         { "VariableDefinition", typeof(VariableDefinition) },
         { "ClassDefinition", typeof(ClassDefinition) },
         { "SchemaDefinition", typeof(SchemaDefinition) },
+        { "DatasourceDefinition", typeof(DatasourceDefinition) },
         { "ExitDefinition", typeof(ExitDefinition) }
     };
 

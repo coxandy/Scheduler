@@ -56,12 +56,12 @@ public class WorkflowErrorHandlingTests
 
         if (throws)
         {
-            mock.Setup(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()))
+            mock.Setup(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()))
                 .ThrowsAsync(new InvalidOperationException($"Error in {blockName}"));
         }
         else
         {
-            mock.Setup(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()))
+            mock.Setup(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()))
                 .Returns(Task.CompletedTask);
         }
 
@@ -78,8 +78,8 @@ public class WorkflowErrorHandlingTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => task.Run());
 
-        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Never);
+        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Never);
     }
 
     [Fact]
@@ -92,8 +92,8 @@ public class WorkflowErrorHandlingTests
 
         await task.Run();
 
-        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
+        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
     }
 
     [Fact]
@@ -107,9 +107,9 @@ public class WorkflowErrorHandlingTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => task.Run());
 
-        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Never);
+        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Never);
     }
 
     [Fact]
@@ -123,9 +123,9 @@ public class WorkflowErrorHandlingTests
 
         await task.Run();
 
-        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
+        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
     }
 
     [Fact]
@@ -140,9 +140,9 @@ public class WorkflowErrorHandlingTests
 
         await task.Run();
 
-        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Never);
-        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
+        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Never);
+        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
     }
 
     [Fact]
@@ -156,16 +156,16 @@ public class WorkflowErrorHandlingTests
 
         await task.Run();
 
-        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
-        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()), Times.Once);
+        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
+        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()), Times.Once);
     }
 
     [Fact]
     public async Task Run_AbortTask_ThrowsOriginalException()
     {
         var block1 = CreateMockBlock("ClassDefinition1", eOnError.AbortTask);
-        block1.Setup(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>()))
+        block1.Setup(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>()))
             .ThrowsAsync(new InvalidOperationException("Database connection failed"));
 
         var task = CreateTaskWithBlocks([block1.Object]);
