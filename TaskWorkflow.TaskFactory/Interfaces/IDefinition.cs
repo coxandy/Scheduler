@@ -1,9 +1,12 @@
 using TaskWorkflow.Common.Models;
+using TaskWorkflow.Common.Models.Enums;
 
 namespace TaskWorkflow.TaskFactory.Interfaces;
 
 public interface IDefinition
 {
     public bool IsActive { get; set; }
+    public string BlockName { get; set; }
+    public eOnError OnError { get; set; }
     Task RunDefinitionBlockAsync(TaskInstance taskInstance);
 }

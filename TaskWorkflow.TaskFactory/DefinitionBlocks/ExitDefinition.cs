@@ -1,17 +1,19 @@
+using TaskWorkflow.Common.Models.TaskDefinition;
 using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.Enums;
 
 namespace TaskWorkflow.TaskFactory.DefinitionBlocks;
 
-public class VariableDefinition : IDefinition
+public class ExitDefinition: IDefinition
 {
     public bool IsActive { get; set; } = true;
     public string BlockName{ get; set; } = String.Empty;
     public eOnError OnError { get; set; } = eOnError.AbortTask;
+    public EmailOutcome Success { get; set; }
+    public EmailOutcome Failure { get; set; }
 
-    public Dictionary<string, object> Variables { get; set; } = new();
-    
+
     public async Task RunDefinitionBlockAsync(TaskInstance taskInstance)
     {
         Console.Write($"RunId: {taskInstance.RunId}  Running {GetType().Name}..");

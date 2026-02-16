@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Serilog;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
@@ -8,7 +9,6 @@ namespace TaskWorkflow.TaskFactory.Tasks.Base;
 
 public abstract class BaseTask
 {
-
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -19,7 +19,8 @@ public abstract class BaseTask
     {
         { "VariableDefinition", typeof(VariableDefinition) },
         { "ClassDefinition", typeof(ClassDefinition) },
-        { "SchemaDefinition", typeof(SchemaDefinition) }
+        { "SchemaDefinition", typeof(SchemaDefinition) },
+        { "ExitDefinition", typeof(ExitDefinition) }
     };
 
     private readonly string _json;
@@ -32,12 +33,19 @@ public abstract class BaseTask
 
     public abstract Task Run();
 
+    // Internal accessors for unit testing
+    internal List<IDefinition> GetDefinitionBlocks() => DefinitionBlocks;
+    internal void SetDefinitionBlocks(List<IDefinition> blocks) => DefinitionBlocks = blocks;
+    internal Dictionary<string, object> GetVariables() => Variables;
+    internal IServiceProvider GetServiceProvider() => ServiceProvider;
+    internal TaskInstance GetTaskInstance() => Instance;
+
     public BaseTask(string json, TaskInstance taskInstance, IServiceProvider serviceProvider)
     {
         _json = json;
         this.Instance = taskInstance;
         this.ServiceProvider = serviceProvider;
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(_json);
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(_json, taskInstance.EffectiveDate, taskInstance.EnvironmentName);
         
         //====================================================================================
         // VariableDefinition is exceptional because it has to be processed prior to the 
@@ -56,5 +64,12 @@ public abstract class BaseTask
 
         // Get final block definition
         this.DefinitionBlocks = JsonParser.DeserializeDefinitionBlocks(_json);
+    }
+
+    // Process any definition block errors
+    protected async Task ProcessTaskErrorAsync(Exception ex, IDefinition defBlock)
+    {
+        Log.Error($"Error occured in '{defBlock.BlockName}': {ex.Message}");
+        //email
     }
 }

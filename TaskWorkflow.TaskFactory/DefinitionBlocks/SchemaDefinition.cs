@@ -1,12 +1,15 @@
 using System.Text.Json.Serialization;
 using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.Common.Models;
+using TaskWorkflow.Common.Models.Enums;
 
 namespace TaskWorkflow.TaskFactory.DefinitionBlocks;
 
 public class SchemaDefinition : IDefinition
 {
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
+    public string BlockName{ get; set; } = String.Empty;
+    public eOnError OnError { get; set; } = eOnError.AbortTask;
     
     [JsonPropertyName("version")]
     public string Version { get; set; }

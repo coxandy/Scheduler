@@ -15,21 +15,29 @@ public static class TestDataHelper
         string json = """
                 {
                     "VariableDefinition": {
-                        "id": 101,
-                        "role": "Administrator",
-                        "permissions": ["read", "write", "delete"],
-                        "isActive": true
+                        "Variables": {
+                            "<@@ClassName@@>": "Web3.Api.GetBalancesByEpoch",
+                            "<@@MethodName@@>": "GetBalancesByEpoch",
+                            "<@@Param1@@>": "arrayval1",
+                            "<@@Param2@@>": "arrayval2"
+                        },
+                        "IsActive": true
                     },
                     "ClassDefinition": {
-                        "classname": "Web3.Api.GetBalancesByEpoch",
-                        "methodname": "GetBalancesByEpoch",
-                        "parameters": ["arrayval1", "arrayval2" ]
+                        "classname": "<@@ClassName@@>",
+                        "methodname": "<@@MethodName@@>",
+                        "parameters": ["<@@Param1@@>", "<@@Param2@@>"]
                     },
                     "SchemaDefinition": {
                         "version": "v2.1",
                         "lastUpdated": "2024-05-20T14:30:00Z",
                         "isDeprecated": false,
                         "author": "DevOps Team"
+                    },
+                    "ExitDefinition": {
+                        "isActive": true,
+                        "success": { "email": true, "to": ["admin@test.com"], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
+                        "failure": { "email": true, "to": ["admin@test.com"], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
                     }
                 }
                 """;

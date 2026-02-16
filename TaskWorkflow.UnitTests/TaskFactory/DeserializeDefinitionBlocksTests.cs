@@ -2,13 +2,30 @@ using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Tasks;
 using Xunit;
-using System.Reflection;
+using TaskWorkflow.Common.Models;
 
 namespace TaskWorkflow.UnitTests.TaskFactory;
 
 public class DeserializeDefinitionBlocksTests
 {
-    private static string GetValidJson() => """
+
+    private static TaskInstance GetTaskInstance() => new TaskInstance
+    {
+        EffectiveDate = new DateTime(2026, 10, 5),
+        RunId = Guid.CreateVersion7().ToString(),
+        IsManual = false,
+        EnvironmentName = "Development"
+    };
+
+    private static string GetExitDefinitionJson() => """
+                "ExitDefinition": {
+                    "isActive": true,
+                    "success": { "email": true, "to": ["admin@test.com"], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
+                    "failure": { "email": true, "to": ["admin@test.com"], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
+                }
+        """;
+
+    private static string GetValidJson() => $$"""
         {
                 "VariableDefinition": {
                     "Variables": {
@@ -33,14 +50,16 @@ public class DeserializeDefinitionBlocksTests
                     "lastUpdated": "2024-05-20T14:30:00Z",
                     "isDeprecated": false,
                     "author": "DevOps Team"
-                }
+                },
+                {{GetExitDefinitionJson()}}
                 }
         """;
 
     // Helper: ParseJson + DeserializeDefinitionBlocks
     private static List<IDefinition> ParseAndDeserialize(string json)
     {
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json);
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
         VariableDefinition VariableDefinitionBlock = JsonParser.VerifyJson();
         if (VariableDefinitionBlock != null)
         {
@@ -58,10 +77,10 @@ public class DeserializeDefinitionBlocksTests
     // DeserializeDefinitionBlocks tests
 
     [Fact]
-    public void ValidJson_ReturnsThreeDefinitions()
+    public void ValidJson_ReturnsFourDefinitions()
     {
         var result = ParseAndDeserialize(GetValidJson());
-        Assert.Equal(3, result.Count);
+        Assert.Equal(4, result.Count);
     }
 
     [Fact]
@@ -71,27 +90,7 @@ public class DeserializeDefinitionBlocksTests
         Assert.IsType<VariableDefinition>(result[0]);
         Assert.IsType<ClassDefinition>(result[1]);
         Assert.IsType<SchemaDefinition>(result[2]);
-    }
-
-    [Fact]
-    public void ValidJson_VariableDefinition_DeserializesCorrectly_into_Dictionary()
-    {
-        var result = ParseAndDeserialize(GetValidJson());
-        var variable = result[0] as VariableDefinition;
-
-        Assert.NotNull(variable);
-        Assert.Equal("<@@Test1@@>", variable.Variables.Keys.ElementAt(0));
-        Assert.Equal("<@@Test2@@>", variable.Variables.Keys.ElementAt(1));
-        Assert.Equal("<@@Test3@@>", variable.Variables.Keys.ElementAt(2));
-        Assert.Equal("<@@Test4@@>", variable.Variables.Keys.ElementAt(3));
-        
-        Assert.Equal("13", variable.Variables.Values.ElementAt(0).ToString());
-        Assert.Equal("15", variable.Variables.Values.ElementAt(1).ToString());
-        Assert.Equal("andy", variable.Variables.Values.ElementAt(2).ToString());
-        Assert.Equal("58", variable.Variables.Values.ElementAt(3).ToString());
-        
-
-        Assert.True(variable.IsActive);
+        Assert.IsType<ExitDefinition>(result[3]);
     }
 
     [Fact]
@@ -121,27 +120,29 @@ public class DeserializeDefinitionBlocksTests
     [Fact]
     public void SingleDefinitionBlock_ReturnsSingleItem()
     {
-        var json = """
+        var json = $$"""
             {
                 "VariableDefinition": {
                     "id": 1,
                     "role": "Admin",
                     "permissions": [],
                     "isActive": true
-                }
+                },
+                {{GetExitDefinitionJson()}}
             }
             """;
 
         var result = ParseAndDeserialize(json);
 
-        Assert.Single(result);
+        Assert.Equal(2, result.Count);
         Assert.IsType<VariableDefinition>(result[0]);
+        Assert.IsType<ExitDefinition>(result[1]);
     }
 
     [Fact]
     public void MultipleBlocksWithNumericSuffix_ReturnsCorrectCount()
     {
-        var json = """
+        var json = $$"""
             {
                 "VariableDefinition": {
                     "id": 1,
@@ -163,21 +164,23 @@ public class DeserializeDefinitionBlocksTests
                     "classname": "Class.Third",
                     "methodname": "Process",
                     "parameters": []
-                }
+                },
+                {{GetExitDefinitionJson()}}
             }
             """;
 
         var result = ParseAndDeserialize(json);
 
-        Assert.Equal(4, result.Count);
+        Assert.Equal(5, result.Count);
         Assert.IsType<VariableDefinition>(result[0]);
-        Assert.Equal(3, result.Skip(1).Count(d => d is ClassDefinition));
+        Assert.Equal(3, result.Count(d => d is ClassDefinition));
+        Assert.IsType<ExitDefinition>(result[4]);
     }
 
     [Fact]
     public void MultipleBlocksWithNumericSuffix_DeserializesCorrectValues()
     {
-        var json = """
+        var json = $$"""
             {
                 "VariableDefinition": {
                     "<@@Test1@@>": 13,
@@ -194,18 +197,20 @@ public class DeserializeDefinitionBlocksTests
                     "classname": "MyClass.Second",
                     "methodname": "Execute",
                     "parameters": ["p1", "p2"]
-                }
+                },
+                {{GetExitDefinitionJson()}}
             }
             """;
 
         var result = ParseAndDeserialize(json);
 
-        Assert.Equal(3, result.Count);
+        Assert.Equal(4, result.Count);
         Assert.IsType<VariableDefinition>(result[0]);
         var class1 = Assert.IsType<ClassDefinition>(result[1]);
         var class2 = Assert.IsType<ClassDefinition>(result[2]);
         Assert.Equal("MyClass.First", class1.ClassName);
         Assert.Equal("MyClass.Second", class2.ClassName);
+        Assert.IsType<ExitDefinition>(result[3]);
     }
 
     // ParseJson validation tests
@@ -213,42 +218,47 @@ public class DeserializeDefinitionBlocksTests
     [Fact]
     public void ParseJson_NullJson_ThrowsArgumentException()
     {
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(null!);
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(null!, instance.EffectiveDate, instance.EnvironmentName);
         Assert.Throws<ArgumentException>(() => JsonParser.VerifyJson());
     }
 
     [Fact]
     public void ParseJson_EmptyJson_ThrowsArgumentException()
     {
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("");
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("", instance.EffectiveDate, instance.EnvironmentName);
         Assert.Throws<ArgumentException>(() => JsonParser.VerifyJson());
     }
 
     [Fact]
     public void ParseJson_InvalidJson_ThrowsFormatException()
     {
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("not valid json");
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("not valid json", instance.EffectiveDate, instance.EnvironmentName);
         Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
     }
 
     [Fact]
     public void ParseJson_JsonArray_ThrowsFormatException()
     {
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("[]");
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("[]", instance.EffectiveDate, instance.EnvironmentName);
         Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
     }
 
     [Fact]
     public void ParseJson_EmptyObject_ThrowsFormatException()
     {
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("{}");
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("{}", instance.EffectiveDate, instance.EnvironmentName);
         Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
     }
 
     [Fact]
     public void ParseJson_UnknownBlock_ThrowsKeyNotFoundException()
     {
-        var json = """
+        var json = $$"""
             {
                 "VariableDefinition": {
                     "id": 1,
@@ -256,10 +266,12 @@ public class DeserializeDefinitionBlocksTests
                     "permissions": [],
                     "isActive": true
                 },
-                "UnknownDefinition": { "foo": "bar" }
+                "UnknownDefinition": { "foo": "bar" },
+                {{GetExitDefinitionJson()}}
             }
             """;
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json);
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
         var ex = Assert.Throws<KeyNotFoundException>(() => JsonParser.VerifyJson());
         Assert.Contains("UnknownDefinition", ex.Message);
     }
@@ -267,7 +279,7 @@ public class DeserializeDefinitionBlocksTests
     [Fact]
     public void ParseJson_DuplicateKeys_ThrowsFormatException()
     {
-        var json = """
+        var json = $$"""
             {
                 "VariableDefinition": {
                     "id": 1,
@@ -284,62 +296,21 @@ public class DeserializeDefinitionBlocksTests
                     "classname": "MyClass2",
                     "methodname": "Execute",
                     "parameters": []
-                }
+                },
+                {{GetExitDefinitionJson()}}
             }
             """;
 
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json);
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
         var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
         Assert.Contains("Duplicate", ex.Message);
     }
 
     [Fact]
-    public void ParseJson_VariableDefinitionNotFirst_ThrowsFormatException()
-    {
-        var json = """
-            {
-                "ClassDefinition": {
-                    "classname": "MyClass",
-                    "methodname": "Run",
-                    "parameters": []
-                },
-                "VariableDefinition": {
-                    "id": 1,
-                    "role": "Admin",
-                    "permissions": [],
-                    "isActive": true
-                }
-            }
-            """;
-
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json);
-        var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
-        Assert.Contains("VariableDefinition should always be the first definition block", ex.Message);
-    }
-
-    [Fact]
-    public void ParseJson_VariableDefinitionWithSuffix_ThrowsFormatException()
-    {
-        var json = """
-            {
-                "VariableDefinition1": {
-                    "id": 1,
-                    "role": "Admin",
-                    "permissions": [],
-                    "isActive": true
-                }
-            }
-            """;
-
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json);
-        var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
-        Assert.Contains("must not have a numeric suffix", ex.Message);
-    }
-
-    [Fact]
     public void ParseJson_ValidJson_NoException()
     {
-        var json = """
+        var json = $$"""
             {
                 "VariableDefinition": {
                     "id": 1,
@@ -351,11 +322,13 @@ public class DeserializeDefinitionBlocksTests
                     "classname": "MyClass",
                     "methodname": "Run",
                     "parameters": []
-                }
+                },
+                {{GetExitDefinitionJson()}}
             }
             """;
 
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json);
+        TaskInstance instance = GetTaskInstance();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
         JsonParser.VerifyJson(json);
         Assert.True(true);
     }

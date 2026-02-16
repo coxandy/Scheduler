@@ -4,13 +4,14 @@ using System.Text.Json.Serialization;
 using TaskWorkflow.Common.Helpers;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
-
+using System.Text.RegularExpressions;
 namespace TaskWorkflow.TaskFactory.Tasks;
 
 public class WorkflowTaskJsonParser
 {
-
     private string _json = String.Empty;
+    private DateTime _effectiveDate;
+    private string _environmentName;
     private  readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -21,16 +22,21 @@ public class WorkflowTaskJsonParser
     {
         { "VariableDefinition", typeof(VariableDefinition) },
         { "ClassDefinition", typeof(ClassDefinition) },
-        { "SchemaDefinition", typeof(SchemaDefinition) }
+        { "SchemaDefinition", typeof(SchemaDefinition) },
+        { "ExitDefinition", typeof(ExitDefinition) }
     };
 
-    public WorkflowTaskJsonParser (string json)
+    public WorkflowTaskJsonParser (string json, DateTime effectiveDate, string environmentName)
     {
         _json = json;
+        _effectiveDate = effectiveDate;
+        _environmentName = environmentName;
     }
 
     public VariableDefinition VerifyJson()
     {
+        // Replace any '<>' tokens if the exist
+        _json = JsonParsingHelper.ReplaceToken(_json, _effectiveDate, _environmentName);
         // Verify DefinitionBlock Json is valid
         VerifyJson(_json);
         // Return Variable Defintion Block if it exists
@@ -83,8 +89,19 @@ public class WorkflowTaskJsonParser
             }
         }
 
-        var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (blocklist.Contains("ExitDefinition", StringComparer.OrdinalIgnoreCase))
+        {
+            if (String.Compare(blocklist.LastOrDefault(), "ExitDefinition", StringComparison.OrdinalIgnoreCase) != 0)
+            {
+                throw new FormatException("ExitDefinition should always be the last definition block");
+            }
+        }
+        else
+        {
+            throw new FormatException("ExitDefinition missing - it should always be the last definition block");
+        }
 
+        var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var property in root.EnumerateObject())
         {
             var propertyName = property.Name;
@@ -107,7 +124,14 @@ public class WorkflowTaskJsonParser
                 && !propertyName.Equals("VariableDefinition", StringComparison.OrdinalIgnoreCase))
             {
                 document.Dispose();
-                throw new FormatException($"VariableDefinition must not have a numeric suffix. Found '{propertyName}'.");
+                throw new FormatException($"Only one 'VariableDefinition' block permitted. Therefore it must not have a numeric suffix. Found '{propertyName}'.");
+            }
+
+            if (baseName.Equals("ExitDefinition", StringComparison.OrdinalIgnoreCase)
+                && !propertyName.Equals("ExitDefinition", StringComparison.OrdinalIgnoreCase))
+            {
+                document.Dispose();
+                throw new FormatException($"Only one 'ExitDefinition' block permitted. Therefore it must not have a numeric suffix. Found '{propertyName}'.");
             }
         }
     }
@@ -184,7 +208,13 @@ public class WorkflowTaskJsonParser
 
     private string ReplaceVariables(string json, VariableDefinition variableDefinition)
     {
-        var variablesToReplace = ((VariableDefinition)variableDefinition).Variables;
+        var variablesToReplace = variableDefinition.Variables;
+
+        if (variableDefinition.Variables.Keys.Any(x => !Regex.IsMatch(x, JsonParsingHelper.VariablNamePattern)))
+        {
+            throw new FormatException($"Variable names should be formatted with '<@@' + name + '@@>'  (e.g. '<@@ProductId@@>')");
+        }
+
         if (((VariableDefinition)variableDefinition).Variables.Any())
         {
             foreach(var variable in variablesToReplace)
@@ -223,6 +253,7 @@ public class WorkflowTaskJsonParser
                 var definition = JsonSerializer.Deserialize(rawJson, definitionType, _jsonOptions) as IDefinition
                     ?? throw new FormatException($"Failed to deserialize '{property.Name}' into {definitionType.Name}.");
 
+                definition.BlockName = property.Name;
                 definitions.Add(definition);
             }
 

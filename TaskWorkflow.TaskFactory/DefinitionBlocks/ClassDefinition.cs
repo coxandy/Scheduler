@@ -7,8 +7,9 @@ namespace TaskWorkflow.TaskFactory.DefinitionBlocks;
 
 public class ClassDefinition: IDefinition
 {
-    public bool IsActive { get; set; }
-
+    public bool IsActive { get; set; } = true;
+    public string BlockName{ get; set; } = String.Empty;
+    public eOnError OnError { get; set; } = eOnError.AbortTask;
     public eTaskStatus Status { get; set; }
 
     [JsonPropertyName("classname")]
