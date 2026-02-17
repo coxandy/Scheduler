@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Data;
 using Serilog;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
@@ -30,6 +31,7 @@ public abstract class BaseTask
     protected TaskInstance Instance;
     protected List<IDefinition> DefinitionBlocks;
     protected Dictionary<string, object> Variables { get; set; } = new();
+    protected List<DataTable> TaskDataTables { get; set; } = new();
     protected IServiceProvider ServiceProvider { get; set; }
 
     public abstract Task Run();
@@ -38,6 +40,7 @@ public abstract class BaseTask
     internal List<IDefinition> GetDefinitionBlocks() => DefinitionBlocks;
     internal void SetDefinitionBlocks(List<IDefinition> blocks) => DefinitionBlocks = blocks;
     internal Dictionary<string, object> GetVariables() => Variables;
+    internal List<DataTable> GetTaskDataTables() => TaskDataTables;
     internal IServiceProvider GetServiceProvider() => ServiceProvider;
     internal TaskInstance GetTaskInstance() => Instance;
 

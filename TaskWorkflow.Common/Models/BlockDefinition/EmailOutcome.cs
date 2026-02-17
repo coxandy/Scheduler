@@ -1,4 +1,4 @@
-namespace TaskWorkflow.Common.Models.TaskDefinition;
+namespace TaskWorkflow.Common.Models.BlockDefinition;
 public class EmailOutcome
 {
     public bool Email { get; set; }

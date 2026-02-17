@@ -1,4 +1,4 @@
-using TaskWorkflow.Common.Models.TaskDefinition;
+using TaskWorkflow.Common.Models.BlockDefinition;
 using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.Enums;

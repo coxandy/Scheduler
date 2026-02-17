@@ -3,6 +3,7 @@ using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.Common.Models;
+using TaskWorkflow.Common.Models.Enums;
 using Xunit;
 
 namespace TaskWorkflow.UnitTests.DefinitionBlockTests;
@@ -27,36 +28,59 @@ public class DatasourceDefinitionTests
 
     private static string GetDatasourceJson() => """
                 "DatasourceDefinition": {
-                    "Type": "StoredProc",
-                    "Name": "sp_GetUsers",
-                    "Database": "Suppliers",
-                    "DSTable": "users",
-                    "Params": [
+                    "DataSources": [
                         {
-                            "ParameterName": "@EmployeeID",
-                            "SqlDbType": "Int",
-                            "Value": 101
+                            "Type": "StoredProc",
+                            "Name": "sp_GetUsers",
+                            "Database": "Suppliers",
+                            "DSTableName": "users",
+                            "Params": [
+                                {
+                                    "ParameterName": "@EmployeeID",
+                                    "SqlDbType": "Int",
+                                    "Value": 101
+                                },
+                                {
+                                    "ParameterName": "@Note",
+                                    "SqlDbType": "NVarChar",
+                                    "Size": 500,
+                                    "Value": "Annual bonus applied."
+                                },
+                                {
+                                    "ParameterName": "@BonusAmount",
+                                    "SqlDbType": "Decimal",
+                                    "Value": 1500.5
+                                },
+                                {
+                                    "ParameterName": "@EffectiveDate",
+                                    "SqlDbType": "DateTimeOffset",
+                                    "Value": "2023-10-27T10:30:00"
+                                },
+                                {
+                                    "ParameterName": "@ManagerID",
+                                    "SqlDbType": "Int",
+                                    "Value": null
+                                }
+                            ]
                         },
                         {
-                            "ParameterName": "@Note",
-                            "SqlDbType": "NVarChar",
-                            "Size": 500,
-                            "Value": "Annual bonus applied."
-                        },
-                        {
-                            "ParameterName": "@BonusAmount",
-                            "SqlDbType": "Decimal",
-                            "Value": 1500.5
-                        },
-                        {
-                            "ParameterName": "@EffectiveDate",
-                            "SqlDbType": "DateTimeOffset",
-                            "Value": "2023-10-27T10:30:00"
-                        },
-                        {
-                            "ParameterName": "@ManagerID",
-                            "SqlDbType": "Int",
-                            "Value": null
+                            "Type": "StoredProc",
+                            "Name": "sp_GetUserSuppliers",
+                            "Database": "Suppliers",
+                            "DSTableName": "user_suppliers",
+                            "Params": [
+                                {
+                                    "ParameterName": "@SupplierID",
+                                    "SqlDbType": "Int",
+                                    "Value": 27
+                                },
+                                {
+                                    "ParameterName": "@Note",
+                                    "SqlDbType": "NVarChar",
+                                    "Size": 30,
+                                    "Value": "Annual bonus applied."
+                                }
+                            ]
                         }
                     ]
                 }
@@ -89,10 +113,16 @@ public class DatasourceDefinitionTests
 
         Assert.Equal(2, result.Count);
         var ds = Assert.IsType<DatasourceDefinition>(result[0]);
-        Assert.Equal("StoredProc", ds.Type);
-        Assert.Equal("sp_GetUsers", ds.Name);
-        Assert.Equal("Suppliers", ds.Database);
-        Assert.Equal("users", ds.DSTable);
+        Assert.NotNull(ds.DataSources);
+        Assert.Equal(2, ds.DataSources.Count);
+        Assert.Equal(eDatasourceTypeType.StoredProc, ds.DataSources[0].Type);
+        Assert.Equal("sp_GetUsers", ds.DataSources[0].Name);
+        Assert.Equal("Suppliers", ds.DataSources[0].Database);
+        Assert.Equal("users", ds.DataSources[0].DSTableName);
+        Assert.Equal(eDatasourceTypeType.StoredProc, ds.DataSources[1].Type);
+        Assert.Equal("sp_GetUserSuppliers", ds.DataSources[1].Name);
+        Assert.Equal("Suppliers", ds.DataSources[1].Database);
+        Assert.Equal("user_suppliers", ds.DataSources[1].DSTableName);
     }
 
     [Fact]
@@ -108,8 +138,10 @@ public class DatasourceDefinitionTests
         var result = ParseAndDeserialize(json);
         var ds = Assert.IsType<DatasourceDefinition>(result[0]);
 
-        Assert.NotNull(ds.Params);
-        Assert.Equal(5, ds.Params.Count);
+        Assert.NotNull(ds.DataSources[0].Params);
+        Assert.Equal(5, ds.DataSources[0].Params.Count);
+        Assert.NotNull(ds.DataSources[1].Params);
+        Assert.Equal(2, ds.DataSources[1].Params.Count);
     }
 
     [Fact]
@@ -125,11 +157,14 @@ public class DatasourceDefinitionTests
         var result = ParseAndDeserialize(json);
         var ds = Assert.IsType<DatasourceDefinition>(result[0]);
 
-        Assert.Equal("@EmployeeID", ds.Params[0].ParameterName);
-        Assert.Equal("@Note", ds.Params[1].ParameterName);
-        Assert.Equal("@BonusAmount", ds.Params[2].ParameterName);
-        Assert.Equal("@EffectiveDate", ds.Params[3].ParameterName);
-        Assert.Equal("@ManagerID", ds.Params[4].ParameterName);
+        Assert.Equal("@EmployeeID", ds.DataSources[0].Params[0].ParameterName);
+        Assert.Equal("@Note", ds.DataSources[0].Params[1].ParameterName);
+        Assert.Equal("@BonusAmount", ds.DataSources[0].Params[2].ParameterName);
+        Assert.Equal("@EffectiveDate", ds.DataSources[0].Params[3].ParameterName);
+        Assert.Equal("@ManagerID", ds.DataSources[0].Params[4].ParameterName);
+
+        Assert.Equal("@SupplierID", ds.DataSources[1].Params[0].ParameterName);
+        Assert.Equal("@Note", ds.DataSources[1].Params[1].ParameterName);
     }
 
     [Fact]
@@ -145,11 +180,14 @@ public class DatasourceDefinitionTests
         var result = ParseAndDeserialize(json);
         var ds = Assert.IsType<DatasourceDefinition>(result[0]);
 
-        Assert.Equal(SqlDbType.Int, ds.Params[0].SqlDbType);
-        Assert.Equal(SqlDbType.NVarChar, ds.Params[1].SqlDbType);
-        Assert.Equal(SqlDbType.Decimal, ds.Params[2].SqlDbType);
-        Assert.Equal(SqlDbType.DateTimeOffset, ds.Params[3].SqlDbType);
-        Assert.Equal(SqlDbType.Int, ds.Params[4].SqlDbType);
+        Assert.Equal(SqlDbType.Int, ds.DataSources[0].Params[0].SqlDbType);
+        Assert.Equal(SqlDbType.NVarChar, ds.DataSources[0].Params[1].SqlDbType);
+        Assert.Equal(SqlDbType.Decimal, ds.DataSources[0].Params[2].SqlDbType);
+        Assert.Equal(SqlDbType.DateTimeOffset, ds.DataSources[0].Params[3].SqlDbType);
+        Assert.Equal(SqlDbType.Int, ds.DataSources[0].Params[4].SqlDbType);
+
+        Assert.Equal(SqlDbType.Int, ds.DataSources[1].Params[0].SqlDbType);
+        Assert.Equal(SqlDbType.NVarChar, ds.DataSources[1].Params[1].SqlDbType);
     }
 
     [Fact]
@@ -165,11 +203,14 @@ public class DatasourceDefinitionTests
         var result = ParseAndDeserialize(json);
         var ds = Assert.IsType<DatasourceDefinition>(result[0]);
 
-        Assert.Equal(101L, ds.Params[0].Value);
-        Assert.Equal("Annual bonus applied.", ds.Params[1].Value);
-        Assert.Equal(1500.5, ds.Params[2].Value);
-        Assert.Equal("2023-10-27T10:30:00", ds.Params[3].Value);
-        Assert.Equal(DBNull.Value, ds.Params[4].Value);
+        Assert.Equal(101L, ds.DataSources[0].Params[0].Value);
+        Assert.Equal("Annual bonus applied.", ds.DataSources[0].Params[1].Value);
+        Assert.Equal(1500.5, ds.DataSources[0].Params[2].Value);
+        Assert.Equal("2023-10-27T10:30:00", ds.DataSources[0].Params[3].Value);
+        Assert.Equal(DBNull.Value, ds.DataSources[0].Params[4].Value);
+
+        Assert.Equal(27L, ds.DataSources[1].Params[0].Value);
+        Assert.Equal("Annual bonus applied.", ds.DataSources[1].Params[1].Value);
     }
 
     [Fact]
@@ -185,9 +226,12 @@ public class DatasourceDefinitionTests
         var result = ParseAndDeserialize(json);
         var ds = Assert.IsType<DatasourceDefinition>(result[0]);
 
-        Assert.Equal(0, ds.Params[0].Size);
-        Assert.Equal(500, ds.Params[1].Size);
-        Assert.Equal(0, ds.Params[2].Size);
+        Assert.Equal(0, ds.DataSources[0].Params[0].Size);
+        Assert.Equal(500, ds.DataSources[0].Params[1].Size);
+        Assert.Equal(0, ds.DataSources[0].Params[2].Size);
+
+        Assert.Equal(0, ds.DataSources[1].Params[0].Size);
+        Assert.Equal(30, ds.DataSources[1].Params[1].Size);
     }
 
     [Fact]
@@ -196,18 +240,26 @@ public class DatasourceDefinitionTests
         var json = $$"""
             {
                 "DatasourceDefinition1": {
-                    "Type": "StoredProc",
-                    "Name": "sp_GetUsers",
-                    "Database": "Suppliers",
-                    "DSTable": "users",
-                    "Params": []
+                    "DataSources": [
+                        {
+                            "Type": "StoredProc",
+                            "Name": "sp_GetUsers",
+                            "Database": "Suppliers",
+                            "DSTableName": "users",
+                            "Params": []
+                        }
+                    ]
                 },
                 "DatasourceDefinition2": {
-                    "Type": "StoredProc",
-                    "Name": "sp_GetOrders",
-                    "Database": "Sales",
-                    "DSTable": "orders",
-                    "Params": []
+                    "DataSources": [
+                        {
+                            "Type": "StoredProc",
+                            "Name": "sp_GetOrders",
+                            "Database": "Sales",
+                            "DSTableName": "orders",
+                            "Params": []
+                        }
+                    ]
                 },
                 {{GetExitDefinitionJson()}}
             }
@@ -218,8 +270,8 @@ public class DatasourceDefinitionTests
         Assert.Equal(3, result.Count);
         var ds1 = Assert.IsType<DatasourceDefinition>(result[0]);
         var ds2 = Assert.IsType<DatasourceDefinition>(result[1]);
-        Assert.Equal("sp_GetUsers", ds1.Name);
-        Assert.Equal("sp_GetOrders", ds2.Name);
+        Assert.Equal("sp_GetUsers", ds1.DataSources[0].Name);
+        Assert.Equal("sp_GetOrders", ds2.DataSources[0].Name);
         Assert.Equal("DatasourceDefinition1", ds1.BlockName);
         Assert.Equal("DatasourceDefinition2", ds2.BlockName);
     }
@@ -237,11 +289,15 @@ public class DatasourceDefinitionTests
                     "IsActive": true
                 },
                 "DatasourceDefinition": {
-                    "Type": "StoredProc",
-                    "Name": "<@@ProcName@@>",
-                    "Database": "<@@DbName@@>",
-                    "DSTable": "inventory",
-                    "Params": []
+                    "DataSources": [
+                        {
+                            "Type": "StoredProc",
+                            "Name": "<@@ProcName@@>",
+                            "Database": "<@@DbName@@>",
+                            "DSTableName": "inventory",
+                            "Params": []
+                        }
+                    ]
                 },
                 {{GetExitDefinitionJson()}}
             }
@@ -251,8 +307,8 @@ public class DatasourceDefinitionTests
         var ds = result[1] as DatasourceDefinition;
 
         Assert.NotNull(ds);
-        Assert.Equal("sp_UpdateInventory", ds.Name);
-        Assert.Equal("Warehouse", ds.Database);
+        Assert.Equal("sp_UpdateInventory", ds.DataSources[0].Name);
+        Assert.Equal("Warehouse", ds.DataSources[0].Database);
     }
 
     [Fact]
