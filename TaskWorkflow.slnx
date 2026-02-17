@@ -3,6 +3,7 @@
     <Property Name="StartupProject" Value="TaskWorkflow.Api/TaskWorkflow.Api.csproj" />
   </Properties>
   <Project Path="TaskWorkflow.Common/TaskWorkflow.Common.csproj" />
+  <Project Path="TaskWorkflow.RegressionTests/TaskWorkflow.RegressionTests.csproj" />
   <Project Path="TaskWorkflow.Scheduler/TaskWorkflow.Scheduler.csproj" />
   <Project Path="TaskWorkflow.Api/TaskWorkflow.Api.csproj" />
   <Project Path="TaskWorkflow.UnitTests/TaskWorkflow.UnitTests.csproj" />
