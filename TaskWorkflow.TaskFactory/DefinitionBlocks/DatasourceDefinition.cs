@@ -1,6 +1,8 @@
+using Serilog;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using TaskWorkflow.TaskFactory.Interfaces;
+using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Helpers;
@@ -17,20 +19,74 @@ public class DatasourceDefinition: IDefinition
 
     public List<DataSource> DataSources { get; set; }
 
-    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider)
+    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider, TaskContext taskContext)
     {
+        Log.Debug($"RunDefinitionBlockAsync() - RunId: {taskInstance.RunId}  Running {GetType().Name}..");
         foreach (var ds in DataSources)
         {
-            if (ds.Type == eDatasourceTypeType.StoredProc)
+            List<DataTable> tables = new List<DataTable>();
+            await Task.Run(async () =>
             {
-                var connString = ConnectionStringHelper.GetConnectionString(ds.Database);
-                List<DataTable> tables = await GetDataFromStoredProcAsync(ds, connString);
-            }
-            Console.Write($"RunId: {taskInstance.RunId}  Running {GetType().Name}..");
+                switch (ds.Type)
+                {
+                    case eDatasourceTypeType.StoredProc:
+                        {
+                            var connString = ConnectionStringHelper.GetConnectionString(ds.Database);
+                            tables = await ProcessStoredProcAsync(ds, connString); // can handle multiple recordsets
+                            break;
+                        }
+                    case eDatasourceTypeType.CsvFile:
+                        {
+                            tables.Add(await ProcessCsvFileAsync(ds));
+                            break;
+                        }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(ds.Type), $"Unknown datasource type: {ds.Type}");
+                }
+                taskContext.AddDataTables(tables);
+            });
         }
     }
 
-    private async Task<List<DataTable>> GetDataFromStoredProcAsync(DataSource dataSource, string connectionString)
+    private async Task<DataTable> ProcessCsvFileAsync(DataSource dataSource)
+    {
+        var filePath = Path.Combine(dataSource.CsvFilePath, dataSource.CsvFileName);
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException($"CSV file not found: '{filePath}'");
+
+        var delimiter = dataSource.CsvFileDelimiter == default ? ',' : dataSource.CsvFileDelimiter;
+        var rows = CommonFileHelper.ReadDelimitedFile(filePath, delimiter);
+
+        if (rows.Count == 0)
+            throw new FormatException($"CSV file is empty: '{filePath}'");
+
+        var dt = new DataTable(dataSource.DSTableName);
+        int startIndex = 0;
+
+        if (dataSource.CsvFileHeader)
+        {
+            foreach (var header in rows[0])
+                dt.Columns.Add(header);
+            startIndex = 1;
+        }
+        else
+        {
+            for (int i = 0; i < rows[0].Length; i++)
+                dt.Columns.Add($"Column{i + 1}");
+        }
+
+        for (int r = startIndex; r < rows.Count; r++)
+        {
+            var dataRow = dt.NewRow();
+            for (int i = 0; i < Math.Min(rows[r].Length, dt.Columns.Count); i++)
+                dataRow[i] = rows[r][i];
+            dt.Rows.Add(dataRow);
+        }
+
+        return dt;
+    }
+
+    private async Task<List<DataTable>> ProcessStoredProcAsync(DataSource dataSource, string connectionString)
     {
         var dataTables = new List<DataTable>();
 
@@ -53,6 +109,7 @@ public class DatasourceDefinition: IDefinition
         int resultSetIndex = 0;
         do
         {
+            //Add numeric suffix for multiple datatables
             var tableName = resultSetIndex == 0
                 ? dataSource.DSTableName
                 : $"{dataSource.DSTableName}{resultSetIndex + 1}";
@@ -63,6 +120,9 @@ public class DatasourceDefinition: IDefinition
             resultSetIndex++;
         } while (await reader.NextResultAsync());
 
+        // If only one datatable then no need for numeric suffix
+        if (dataTables.Count == 1) dataTables[0].TableName = dataSource.DSTableName;
+        
         return dataTables;
     }
 }

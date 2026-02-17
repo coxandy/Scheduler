@@ -1,31 +1,13 @@
 using System.Data;
-using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
-using TaskWorkflow.TaskFactory.Tasks;
-using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using Xunit;
+using static TaskWorkflow.UnitTests.Helpers.TestHelpers;
 
 namespace TaskWorkflow.UnitTests.DefinitionBlockTests;
 
 public class DatasourceDefinitionTests
 {
-    private static TaskInstance GetTaskInstance() => new TaskInstance
-    {
-        EffectiveDate = new DateTime(2026, 10, 5),
-        RunId = Guid.CreateVersion7().ToString(),
-        IsManual = false,
-        EnvironmentName = "Development"
-    };
-
-    private static string GetExitDefinitionJson() => """
-                "ExitDefinition": {
-                    "isActive": true,
-                    "success": { "email": true, "to": ["admin@test.com"], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
-                    "failure": { "email": true, "to": ["admin@test.com"], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
-                }
-        """;
-
     private static string GetDatasourceJson() => """
                 "DatasourceDefinition": {
                     "DataSources": [
@@ -85,19 +67,6 @@ public class DatasourceDefinitionTests
                     ]
                 }
         """;
-
-    private static List<IDefinition> ParseAndDeserialize(string json)
-    {
-        TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        VariableDefinition VariableDefinitionBlock = JsonParser.VerifyJson();
-        if (VariableDefinitionBlock != null)
-        {
-            var variables = VariableDefinitionBlock.Variables;
-            json = JsonParser.ApplyVariableReplacementsToJson(json, VariableDefinitionBlock);
-        }
-        return JsonParser.DeserializeDefinitionBlocks(json);
-    }
 
     [Fact]
     public void DatasourceDefinition_DeserializesCorrectly()

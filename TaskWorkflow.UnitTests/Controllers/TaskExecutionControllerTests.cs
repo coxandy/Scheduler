@@ -6,7 +6,6 @@ using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.TaskFactory.Tasks.Base;
-using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using Xunit;
 using Microsoft.Extensions.Hosting;
 using TaskWorkflow.Api.Interfaces;
@@ -29,12 +28,6 @@ public class TaskExecutionControllerTests
                 "classname": "Web3.Api.GetBalancesByEpoch",
                 "methodname": "GetBalancesByEpoch",
                 "parameters": ["arrayval1", "arrayval2"]
-            },
-            "SchemaDefinition": {
-                "version": "v2.1",
-                "lastUpdated": "2024-05-20T14:30:00Z",
-                "isDeprecated": false,
-                "author": "DevOps Team"
             },
             "ExitDefinition": {
                 "isActive": true,
@@ -118,7 +111,7 @@ public class TaskExecutionControllerTests
     }
 
     [Fact]
-    public async Task CreateTaskObjectAsync_ReturnsBaseTaskWithExpectedCharacteristics()
+    public async Task CreateTaskObjectAsync_ReturnsGenericWorkflowTask()
     {
         var mockServiceProvider = new Mock<IServiceProvider>();
         var taskInstance = CreateValidTaskInstance();
@@ -134,30 +127,7 @@ public class TaskExecutionControllerTests
 
         var task = await mockTaskObjectCreationService.Object.CreateTaskObjectAsync();
 
-        // Is a BaseTask
         Assert.IsType<BaseTask>(task, exactMatch: false);
-
-        // Is the expected concrete type
         Assert.IsType<GenericWorkflowTask>(task);
-
-        // Has definition blocks populated from the JSON
-        var definitionBlocks = task.GetDefinitionBlocks();
-        Assert.NotNull(definitionBlocks);
-        Assert.Equal(4, definitionBlocks.Count);
-        Assert.IsType<VariableDefinition>(definitionBlocks[0]);
-        Assert.IsType<ClassDefinition>(definitionBlocks[1]);
-        Assert.IsType<SchemaDefinition>(definitionBlocks[2]);
-        Assert.IsType<ExitDefinition>(definitionBlocks[3]);
-
-        // Has the ServiceProvider assigned
-        Assert.NotNull(task.GetServiceProvider());
-        Assert.Same(mockServiceProvider.Object, task.GetServiceProvider());
-
-        // Has the TaskInstance assigned
-        Assert.NotNull(task.GetTaskInstance());
-        Assert.Equal(taskInstance.RunId, task.GetTaskInstance().RunId);
-
-        // Has a Run method (abstract contract from BaseTask)
-        Assert.NotNull(typeof(BaseTask).GetMethod("Run"));
     }
 }

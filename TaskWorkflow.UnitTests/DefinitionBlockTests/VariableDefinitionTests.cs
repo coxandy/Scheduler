@@ -1,41 +1,13 @@
-using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.Common.Models;
 using Xunit;
+using static TaskWorkflow.UnitTests.Helpers.TestHelpers;
 
 namespace TaskWorkflow.UnitTests.DefinitionBlockTests;
 
 public class VariableDefinitionTests
 {
-    private static TaskInstance GetTaskInstance() => new TaskInstance
-    {
-        EffectiveDate = new DateTime(2026, 10, 5),
-        RunId = Guid.CreateVersion7().ToString(),
-        IsManual = false,
-        EnvironmentName = "Development"
-    };
-
-    private static string GetExitDefinitionJson() => """
-                "ExitDefinition": {
-                    "isActive": true,
-                    "success": { "email": true, "to": ["admin@test.com"], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
-                    "failure": { "email": true, "to": ["admin@test.com"], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
-                }
-        """;
-
-    private static List<IDefinition> ParseAndDeserialize(string json)
-    {
-        TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        VariableDefinition VariableDefinitionBlock = JsonParser.VerifyJson();
-        if (VariableDefinitionBlock != null)
-        {
-            var variables = VariableDefinitionBlock.Variables;
-            json = JsonParser.ApplyVariableReplacementsToJson(json, VariableDefinitionBlock);
-        }
-        return JsonParser.DeserializeDefinitionBlocks(json);
-    }
 
     [Fact]
     public void VariableDefinition_DeserializesIntoDictionary()
@@ -205,9 +177,7 @@ public class VariableDefinitionTests
                     "Variables": {
                         "<@@ClassName@@>": "Web3.Api.GetBalances",
                         "<@@MethodName@@>": "GetBalances",
-                        "<@@Param1@@>": "epoch42",
-                        "<@@SchemaVersion@@>": "v3.0",
-                        "<@@Author@@>": "QA Team"
+                        "<@@Param1@@>": "epoch42"
                     },
                     "IsActive": true
                 },
@@ -215,12 +185,6 @@ public class VariableDefinitionTests
                     "classname": "<@@ClassName@@>",
                     "methodname": "<@@MethodName@@>",
                     "parameters": ["<@@Param1@@>"]
-                },
-                "SchemaDefinition": {
-                    "version": "<@@SchemaVersion@@>",
-                    "lastUpdated": "2024-01-01T00:00:00Z",
-                    "isDeprecated": false,
-                    "author": "<@@Author@@>"
                 },
                 {{GetExitDefinitionJson()}}
             }
@@ -234,11 +198,6 @@ public class VariableDefinitionTests
         Assert.Equal("GetBalances", classDef.MethodName);
         Assert.Single(classDef.Parameters);
         Assert.Equal("epoch42", classDef.Parameters[0]);
-
-        var schemaDef = result[2] as SchemaDefinition;
-        Assert.NotNull(schemaDef);
-        Assert.Equal("v3.0", schemaDef.Version);
-        Assert.Equal("QA Team", schemaDef.Author);
     }
 
     [Fact]
@@ -254,12 +213,6 @@ public class VariableDefinitionTests
                     "classname": "MyClass",
                     "methodname": "Run",
                     "parameters": []
-                },
-                "SchemaDefinition": {
-                    "version": "v1.0",
-                    "lastUpdated": "2024-01-01T00:00:00Z",
-                    "isDeprecated": false,
-                    "author": "Test"
                 },
                 {{GetExitDefinitionJson()}}
             }

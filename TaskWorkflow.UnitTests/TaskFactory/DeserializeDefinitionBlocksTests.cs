@@ -1,30 +1,13 @@
-using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Tasks;
-using Xunit;
 using TaskWorkflow.Common.Models;
+using Xunit;
+using static TaskWorkflow.UnitTests.Helpers.TestHelpers;
 
 namespace TaskWorkflow.UnitTests.TaskFactory;
 
 public class DeserializeDefinitionBlocksTests
 {
-
-    private static TaskInstance GetTaskInstance() => new TaskInstance
-    {
-        EffectiveDate = new DateTime(2026, 10, 5),
-        RunId = Guid.CreateVersion7().ToString(),
-        IsManual = false,
-        EnvironmentName = "Development"
-    };
-
-    private static string GetExitDefinitionJson() => """
-                "ExitDefinition": {
-                    "isActive": true,
-                    "success": { "email": true, "to": ["admin@test.com"], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
-                    "failure": { "email": true, "to": ["admin@test.com"], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
-                }
-        """;
-
     private static string GetValidJson() => $$"""
         {
                 "VariableDefinition": {
@@ -45,43 +28,11 @@ public class DeserializeDefinitionBlocksTests
                     "arrayval2"
                     ]
                 },
-                "SchemaDefinition": {
-                    "version": "v2.1",
-                    "lastUpdated": "2024-05-20T14:30:00Z",
-                    "isDeprecated": false,
-                    "author": "DevOps Team"
-                },
                 {{GetExitDefinitionJson()}}
                 }
         """;
 
-    // Helper: ParseJson + DeserializeDefinitionBlocks
-    private static List<IDefinition> ParseAndDeserialize(string json)
-    {
-        TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        VariableDefinition VariableDefinitionBlock = JsonParser.VerifyJson();
-        if (VariableDefinitionBlock != null)
-        {
-            // Assign variables to class
-            var variables = VariableDefinitionBlock.Variables;
-
-            // Apply variable replacement to Json
-            json = JsonParser.ApplyVariableReplacementsToJson(json, VariableDefinitionBlock);
-        }
-
-        // Get final block definition
-        return JsonParser.DeserializeDefinitionBlocks(json);
-    }
-
     // DeserializeDefinitionBlocks tests
-
-    [Fact]
-    public void ValidJson_ReturnsFourDefinitions()
-    {
-        var result = ParseAndDeserialize(GetValidJson());
-        Assert.Equal(4, result.Count);
-    }
 
     [Fact]
     public void ValidJson_ReturnsCorrectTypes()
@@ -89,8 +40,7 @@ public class DeserializeDefinitionBlocksTests
         var result = ParseAndDeserialize(GetValidJson());
         Assert.IsType<VariableDefinition>(result[0]);
         Assert.IsType<ClassDefinition>(result[1]);
-        Assert.IsType<SchemaDefinition>(result[2]);
-        Assert.IsType<ExitDefinition>(result[3]);
+        Assert.IsType<ExitDefinition>(result[2]);
     }
 
     [Fact]
@@ -103,18 +53,6 @@ public class DeserializeDefinitionBlocksTests
         Assert.Equal("Web3.Api.GetBalancesByEpoch", classDef.ClassName);
         Assert.Equal("GetBalancesByEpoch", classDef.MethodName);
         Assert.Equal(2, classDef.Parameters.Count);
-    }
-
-    [Fact]
-    public void ValidJson_SchemaDefinition_DeserializesCorrectly()
-    {
-        var result = ParseAndDeserialize(GetValidJson());
-        var schema = result[2] as SchemaDefinition;
-
-        Assert.NotNull(schema);
-        Assert.Equal("v2.1", schema.Version);
-        Assert.Equal("DevOps Team", schema.Author);
-        Assert.False(schema.IsDeprecated);
     }
 
     [Fact]

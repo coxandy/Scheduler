@@ -1,7 +1,6 @@
+using Serilog;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Data;
-using Serilog;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
@@ -16,22 +15,12 @@ public abstract class BaseTask
         Converters = { new JsonStringEnumConverter() }
     };
 
-    private static readonly Dictionary<string, Type> _definitionBlockTypeMap = new(StringComparer.OrdinalIgnoreCase)
-    {
-        { "VariableDefinition", typeof(VariableDefinition) },
-        { "ClassDefinition", typeof(ClassDefinition) },
-        { "SchemaDefinition", typeof(SchemaDefinition) },
-        { "DatasourceDefinition", typeof(DatasourceDefinition) },
-        { "ExitDefinition", typeof(ExitDefinition) }
-    };
-
     private readonly string _json;
 
     //protected properties
     protected TaskInstance Instance;
     protected List<IDefinition> DefinitionBlocks;
-    protected Dictionary<string, object> Variables { get; set; } = new();
-    protected List<DataTable> TaskDataTables { get; set; } = new();
+    protected TaskContext TaskContext { get; set; } = new();
     protected IServiceProvider ServiceProvider { get; set; }
 
     public abstract Task Run();
@@ -39,8 +28,7 @@ public abstract class BaseTask
     // Internal accessors for unit testing
     internal List<IDefinition> GetDefinitionBlocks() => DefinitionBlocks;
     internal void SetDefinitionBlocks(List<IDefinition> blocks) => DefinitionBlocks = blocks;
-    internal Dictionary<string, object> GetVariables() => Variables;
-    internal List<DataTable> GetTaskDataTables() => TaskDataTables;
+    internal TaskContext GetTaskContext() => TaskContext;
     internal IServiceProvider GetServiceProvider() => ServiceProvider;
     internal TaskInstance GetTaskInstance() => Instance;
 
@@ -59,8 +47,11 @@ public abstract class BaseTask
         VariableDefinition VariableDefinitionBlock = JsonParser.VerifyJson();
         if (VariableDefinitionBlock != null)
         {
-            // Assign variables to class
-            this.Variables = VariableDefinitionBlock.Variables;
+            // Assign variables to TaskContext
+            foreach (var variable in VariableDefinitionBlock.Variables)
+            {
+                this.TaskContext.SetVariable(variable.Key, variable.Value);
+            }
 
             // Apply variable replacement to Json
             _json = JsonParser.ApplyVariableReplacementsToJson(_json, VariableDefinitionBlock);

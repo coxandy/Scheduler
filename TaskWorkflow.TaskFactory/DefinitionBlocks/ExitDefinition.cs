@@ -1,5 +1,7 @@
+using Serilog;
 using TaskWorkflow.Common.Models.BlockDefinition;
 using TaskWorkflow.TaskFactory.Interfaces;
+using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 
@@ -14,8 +16,8 @@ public class ExitDefinition: IDefinition
     public EmailOutcome Failure { get; set; }
 
 
-    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider)
+    public async Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider, TaskContext taskContext)
     {
-        Console.Write($"RunId: {taskInstance.RunId}  Running {GetType().Name}..");
+        Log.Debug($"RunDefinitionBlockAsync() - RunId: {taskInstance.RunId}  Running {GetType().Name}..");
     }
 }

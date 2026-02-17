@@ -28,12 +28,6 @@ public static class TestDataHelper
                         "methodname": "<@@MethodName@@>",
                         "parameters": ["<@@Param1@@>", "<@@Param2@@>"]
                     },
-                    "SchemaDefinition": {
-                        "version": "v2.1",
-                        "lastUpdated": "2024-05-20T14:30:00Z",
-                        "isDeprecated": false,
-                        "author": "DevOps Team"
-                    },
                     "ExitDefinition": {
                         "isActive": true,
                         "success": { "email": true, "to": ["admin@test.com"], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },

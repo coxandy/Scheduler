@@ -18,7 +18,7 @@ public class GenericWorkflowTask: BaseTask
             {
                 if (defBlock.IsActive)
                 {
-                    await defBlock.RunDefinitionBlockAsync(this.Instance, this.ServiceProvider);
+                    await defBlock.RunDefinitionBlockAsync(this.Instance, this.ServiceProvider, this.TaskContext);
                 }
             }
             catch (Exception ex)

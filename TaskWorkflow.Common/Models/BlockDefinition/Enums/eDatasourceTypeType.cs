@@ -4,6 +4,6 @@ public enum eDatasourceTypeType
 {
     StoredProc=1,
     Sql=2,
-    File=3,
+    CsvFile=3,
     Url=4
 }

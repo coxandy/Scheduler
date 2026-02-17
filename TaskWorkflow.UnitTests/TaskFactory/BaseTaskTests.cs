@@ -1,21 +1,13 @@
 using Moq;
-using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.Tasks;
 using Xunit;
+using static TaskWorkflow.UnitTests.Helpers.TestHelpers;
 
 namespace TaskWorkflow.UnitTests.TaskFactory;
 
 public class BaseTaskTests
 {
     private readonly Mock<IServiceProvider> _mockServiceProvider = new();
-
-    private static TaskInstance GetTaskInstance() => new TaskInstance
-    {
-        EffectiveDate = new DateTime(2026, 10, 5),
-        RunId = Guid.CreateVersion7().ToString(),
-        IsManual = false,
-        EnvironmentName = "Development"
-    };
 
     private static string GetValidJson() => """
         {
@@ -35,12 +27,6 @@ public class BaseTaskTests
                     "arrayval1",
                     "arrayval2"
                 ]
-            },
-            "SchemaDefinition": {
-                "version": "v2.1",
-                "lastUpdated": "2024-05-20T14:30:00Z",
-                "isDeprecated": false,
-                "author": "DevOps Team"
             },
             "ExitDefinition": {
                 "isActive": true,
@@ -62,7 +48,7 @@ public class BaseTaskTests
     public void Constructor_ValidJson_ExtractsVariables()
     {
         var task = new GenericWorkflowTask(GetValidJson(), GetTaskInstance(), _mockServiceProvider.Object);
-        var variables = task.GetVariables();
+        var variables = task.GetTaskContext().GetAllVariables();
 
         Assert.Equal(4, variables.Count);
         Assert.Equal("13", variables["<@@Test1@@>"].ToString());
@@ -77,7 +63,7 @@ public class BaseTaskTests
         await task.Run();
 
         // If Run completes without exception, all blocks were executed
-        Assert.Equal(4, task.GetDefinitionBlocks().Count);
+        Assert.Equal(3, task.GetDefinitionBlocks().Count);
     }
 
     [Fact]
