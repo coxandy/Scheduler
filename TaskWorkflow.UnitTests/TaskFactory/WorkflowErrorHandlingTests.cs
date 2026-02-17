@@ -1,6 +1,6 @@
 using Moq;
 using TaskWorkflow.Common.Models;
-using TaskWorkflow.Common.Models.Enums;
+using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.TaskFactory.Tasks;

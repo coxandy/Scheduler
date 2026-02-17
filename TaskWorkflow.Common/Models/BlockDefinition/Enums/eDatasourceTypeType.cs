@@ -1,4 +1,4 @@
-namespace TaskWorkflow.Common.Models.Enums;
+namespace TaskWorkflow.Common.Models.BlockDefinition.Enums;
 
 public enum eDatasourceTypeType
 {

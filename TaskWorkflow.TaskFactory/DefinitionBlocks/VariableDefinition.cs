@@ -1,6 +1,6 @@
 using TaskWorkflow.TaskFactory.Interfaces;
 using TaskWorkflow.Common.Models;
-using TaskWorkflow.Common.Models.Enums;
+using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 
 namespace TaskWorkflow.TaskFactory.DefinitionBlocks;
 

@@ -1,7 +1,7 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 using TaskWorkflow.TaskFactory.Interfaces;
-using TaskWorkflow.Common.Models.Enums;
+using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Helpers;
 using TaskWorkflow.Common.Models.BlockDefinition;

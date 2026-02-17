@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.Hosting;
+using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Scheduler.Interfaces;
 using Serilog;
@@ -27,7 +27,7 @@ public class TaskExecutionService : ITaskExecutionService
         taskInstance.Instance = scheduledTask;
         taskInstance.EffectiveDate = DateTime.Today.AddDays(scheduledTask.DayOffset);
         taskInstance.IsManual = false;
-        taskInstance.Status= Common.Models.Enums.eTaskStatus.ReadyToRun;
+        taskInstance.Status= eTaskStatus.ReadyToRun;
         taskInstance.EnvironmentName = _hostingEnvironment.EnvironmentName;
         string json = JsonSerializer.Serialize(taskInstance);
         await PostScheduledTask(json, scheduledTask.WebService);

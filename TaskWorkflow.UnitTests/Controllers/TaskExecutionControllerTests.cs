@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using TaskWorkflow.Api.Controllers;
 using TaskWorkflow.Common.Models;
-using TaskWorkflow.Common.Models.Enums;
+using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.TaskFactory.Tasks.Base;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
