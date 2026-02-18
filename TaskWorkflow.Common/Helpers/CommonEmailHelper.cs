@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -7,21 +8,16 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Processing;
 using TaskWorkflow.Common.Models.BlockDefinition;
+using TaskWorkflow.Common.Models.Configuration;
 using TaskWorkflow.Common.Tasks;
 
 namespace TaskWorkflow.Common.Helpers;
 
 public static class CommonEmailHelper
 {
-    const string _sourceEmailName = "Andy Cox";
-    const string _sourceEmail = "coxandy@yahoo.com";
-
-    // Yahoo - App: C#Email
-    // Use your 16-character Yahoo App Password (no spaces)
-    const string _yahookey = "qrqunmydnvrmeuuv";
-
     public static async Task SendEmailAsync (   Message emailMessage,
                                                 TaskContext taskContext,
+                                                EmailSettings emailSettings,
                                                 List<object>? chartConfigList = null,                                       
                                                 int chartWidthPercent = 100,
                                                 int chartHeightPercent = 100,
@@ -37,7 +33,7 @@ public static class CommonEmailHelper
 
         //Create message
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(_sourceEmailName, _sourceEmail));
+        message.From.Add(new MailboxAddress(emailSettings.SenderName, emailSettings.SenderEmail));
 
         //Create recipient list (To, CC, BCC)
         if ((!emailMessage.To.Any()) && (!emailMessage.CC.Any()) && (!emailMessage.BCC.Any()))
@@ -99,13 +95,27 @@ public static class CommonEmailHelper
             }
         }
 
+        body = ProcessEmailBody(body, taskContext);
         builder.HtmlBody = body;
         await AddAttachments(builder, emailMessage.Attachments);
 
         // Assign the combined content to the message body
         message.Body = builder.ToMessageBody();
 
-        await SendMessageAsync(message);
+        await SendMessageAsync(message, emailSettings);
+    }
+
+    internal static string ProcessEmailBody(string body, TaskContext taskContext)
+    {
+        return Regex.Replace(body, @"<<DATATABLE:\s*(.+?)>>", match =>
+        {
+            var tableName = match.Groups[1].Value.Trim();
+            var dataTable = taskContext.GetDataTable(tableName);
+            if (dataTable == null)
+                return match.Value;
+
+            return CommonHtmlHelper.DataTableToHtml(dataTable, showColumnHeaders: true);
+        });
     }
 
     private static async Task AddAttachments(BodyBuilder builder, List<string>? filePaths)
@@ -123,16 +133,14 @@ public static class CommonEmailHelper
         }
     }
 
-    private static async Task SendMessageAsync(MimeMessage message)
+    private static async Task SendMessageAsync(MimeMessage message, EmailSettings emailSettings)
     {
         using (var client = new SmtpClient())
         {
             try
             {
-                await client.ConnectAsync("smtp.mail.yahoo.com", 587, SecureSocketOptions.StartTls);
-                // Yahoo - App: C#Email
-                // Use your 16-character Yahoo App Password (no spaces)
-                await client.AuthenticateAsync(_sourceEmail, _yahookey);
+                await client.ConnectAsync(emailSettings.SmtpServer, emailSettings.SmtpPort, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(emailSettings.SenderEmail, emailSettings.AppPassword);
                 await client.SendAsync(message);
             }
             catch (Exception ex)

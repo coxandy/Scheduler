@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using TaskWorkflow.Common.Models;
 
 namespace TaskWorkflow.RegressionTests;
@@ -11,4 +13,16 @@ public static class TestHelper
         IsManual = false,
         EnvironmentName = "Development"
     };
+
+    public static IServiceProvider GetServiceProvider()
+    {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
+
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(configuration);
+        return services.BuildServiceProvider();
+    }
 }

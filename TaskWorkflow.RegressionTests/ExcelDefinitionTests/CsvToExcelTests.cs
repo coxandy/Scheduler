@@ -74,7 +74,7 @@ public class CsvToExcelTests : IDisposable
 
         // Act — run the full task workflow (parse JSON, deserialize blocks, execute each)
         var taskInstance = TestHelper.GetTaskInstance();
-        var task = new GenericWorkflowTask(taskJson, taskInstance, null!);
+        var task = new GenericWorkflowTask(taskJson, taskInstance, TestHelper.GetServiceProvider());
         bool success = await task.Run();
 
         // Assert — read back the Excel file and verify data matches the CSV

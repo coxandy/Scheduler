@@ -73,7 +73,7 @@ public class SimpleEmailTests : IDisposable
 
         // Act — run the full task workflow (parse JSON, deserialize blocks, execute each)
         var taskInstance = TestHelper.GetTaskInstance();
-        var task = new GenericWorkflowTask(taskJson, taskInstance, null!);
+        var task = new GenericWorkflowTask(taskJson, taskInstance, TestHelper.GetServiceProvider());
         bool success = await task.Run();
 
         // Assert — task executed succssfully

@@ -79,23 +79,27 @@ public abstract class BaseTask
 
     private async Task SendTaskErrorMessageAsync(Exception ex, IDefinition defBlock)
     {
+        var emailSettings = EmailDefinition.ResolveEmailSettings(ServiceProvider);
+
         Message msg = new Message();
         msg.SendEmail = true;
         msg.Priority = "High";
-            
+
         var exitDefinitionBlock = (ExitDefinition)DefinitionBlocks.FirstOrDefault(x => x.BlockName.ToUpper().StartsWith("ExitDefinition".ToUpper()));
-        if ((exitDefinitionBlock != null) && (exitDefinitionBlock.Failure != null)) 
+        if ((exitDefinitionBlock != null) && (exitDefinitionBlock.Failure != null))
         {
-            msg = exitDefinitionBlock.Failure;    
+            msg = exitDefinitionBlock.Failure;
         }
         else
         {
             //======================================================================================
             // If ExitDefinition Failure email is not configured - use default exception email
             //======================================================================================
+            string taskError = $"\nException: {ex.Message}";
+            if (ex.InnerException != null ) taskError += $"\nInner: {ex.InnerException.Message}";
             msg.Subject = $"[{Instance.EnvironmentName}]\nError thrown in Task Name: {Instance.Instance.TaskName}";
-            msg.Body = $"\n\nTask Id: {Instance.Instance.TaskId}\nTask Name: {Instance.Instance.TaskName}\nTask Error: {ex.Message}";
-            msg.To.Add("coxandy@yahoo.com");
+            msg.Body = $"\n\nTask Id: {Instance.Instance.TaskId}\nTask Name: {Instance.Instance.TaskName}\n{taskError}";
+            msg.To.Add(emailSettings.DefaultErrorRecipient);
             msg.IncludeBanner = true;
             msg.BannerFilePath = Path.Combine(AppContext.BaseDirectory, "Resources", "Images");
             msg.BannerFileName = "erroremailbanner.png";
@@ -105,7 +109,7 @@ public abstract class BaseTask
         //send email
         if (msg.SendEmail)
         {
-            await CommonEmailHelper.SendEmailAsync(msg, TaskContext);
+            await CommonEmailHelper.SendEmailAsync(msg, TaskContext, emailSettings);
         }
     }
 }

@@ -51,7 +51,7 @@ public class TaskFailureTests
         taskInstance.Instance.TaskName = "TaskFailureTests";
         taskInstance.Instance.TaskId = 999;
 
-        var task = new GenericWorkflowTask(taskJson, taskInstance, null!);
+        var task = new GenericWorkflowTask(taskJson, taskInstance, TestHelper.GetServiceProvider());
         await Assert.ThrowsAsync<FileNotFoundException>(async () => await task.Run());
     }
 }

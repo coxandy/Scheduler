@@ -30,6 +30,7 @@ public class Program
         var environmentName = configuration.GetValue<string>("Environment") ?? "Development";
 
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(configuration);
         services.AddSingleton<IHostEnvironment>(new HostingEnvironment { EnvironmentName = environmentName });
         services.AddHttpClient();
         services.AddTransient<ITaskExecutionService, TaskExecutionService>();
