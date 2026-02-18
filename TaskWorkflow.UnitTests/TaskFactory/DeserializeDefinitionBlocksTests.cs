@@ -1,4 +1,5 @@
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.Common.Models;
 using Xunit;

@@ -1,7 +1,7 @@
 using Serilog;
 using TaskWorkflow.Common.Models.BlockDefinition;
 using TaskWorkflow.TaskFactory.Interfaces;
-using TaskWorkflow.TaskFactory.Tasks;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 
@@ -12,8 +12,8 @@ public class ExitDefinition: IDefinition
     public bool IsActive { get; set; } = true;
     public string BlockName{ get; set; } = String.Empty;
     public eOnError OnError { get; set; } = eOnError.AbortTask;
-    public EmailOutcome Success { get; set; }
-    public EmailOutcome Failure { get; set; }
+    public Message Success { get; set; }
+    public Message Failure { get; set; }
 
 
     public async Task RunDefinitionBlockAsync(TaskInstance taskInstance, IServiceProvider serviceProvider, TaskContext taskContext)

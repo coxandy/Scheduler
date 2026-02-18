@@ -1,6 +1,7 @@
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.TaskFactory.Tasks;
 
 namespace TaskWorkflow.UnitTests.Helpers;
@@ -18,8 +19,8 @@ internal static class TestHelpers
     internal static string GetExitDefinitionJson() => """
                 "ExitDefinition": {
                     "isActive": true,
-                    "success": { "email": true, "to": ["admin@test.com"], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
-                    "failure": { "email": true, "to": ["admin@test.com"], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
+                    "success": { "email": true, "to": ["admin@test.com"], "cc": [], "bcc": [], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
+                    "failure": { "email": true, "to": ["admin@test.com"], "cc": [], "bcc": [], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
                 }
         """;
 

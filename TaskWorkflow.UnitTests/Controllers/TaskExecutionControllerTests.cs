@@ -4,6 +4,7 @@ using Moq;
 using TaskWorkflow.Api.Controllers;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.TaskFactory.Tasks.Base;
 using Xunit;

@@ -3,6 +3,7 @@ using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.TaskFactory.Tasks;
 using Xunit;
 using static TaskWorkflow.UnitTests.Helpers.TestHelpers;

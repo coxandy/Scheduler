@@ -2,6 +2,7 @@ using Serilog;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TaskWorkflow.Common.Models;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
 

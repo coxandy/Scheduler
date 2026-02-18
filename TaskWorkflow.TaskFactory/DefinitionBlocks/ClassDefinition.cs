@@ -1,7 +1,7 @@
 using Serilog;
 using System.Text.Json.Serialization;
 using TaskWorkflow.TaskFactory.Interfaces;
-using TaskWorkflow.TaskFactory.Tasks;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 

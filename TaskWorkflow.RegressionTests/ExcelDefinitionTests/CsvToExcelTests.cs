@@ -1,8 +1,7 @@
 using ClosedXML.Excel;
-using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.Tasks;
 
-namespace TaskWorkflow.RegressionTests;
+namespace TaskWorkflow.RegressionTests.ExcelDefinitionTests;
 
 public class CsvToExcelTests : IDisposable
 {
@@ -24,21 +23,14 @@ public class CsvToExcelTests : IDisposable
         return path;
     }
 
-    private static TaskInstance GetTaskInstance() => new()
-    {
-        EffectiveDate = new DateTime(2026, 10, 5),
-        RunId = Guid.CreateVersion7().ToString(),
-        IsManual = false,
-        EnvironmentName = "Development"
-    };
-
     [Fact]
-    public async Task CsvToExcel_DataIsPreserved()
+    public async Task CsvToExcel_DataIsPreserved_RegressionTest()
     {
         // Arrange — dynamically create temp files
         var csvPath = CreateTempFile(".csv");
         var xlsxPath = CreateTempFile(".xlsx");
 
+        // Write test .csv file
         var csvContent = "Name,Age,City\nAlice,30,London\nBob,25,Manchester\nCharlie,35,Birmingham";
         await File.WriteAllTextAsync(csvPath, csvContent);
 
@@ -74,16 +66,16 @@ public class CsvToExcelTests : IDisposable
                     ]
                 },
                 "ExitDefinition": {
-                    "Success": { "Email": false, "To": [], "Subject": "", "Body": "", "Priority": "Normal", "Attachments": [] },
-                    "Failure": { "Email": false, "To": [], "Subject": "", "Body": "", "Priority": "Normal", "Attachments": [] }
+                    "Success": { "Email": false, "To": [], "CC": [], "BCC": [], "Subject": "", "Body": "", "Priority": "Normal", "Attachments": [] },
+                    "Failure": { "Email": false, "To": [], "CC": [], "BCC": [], "Subject": "", "Body": "", "Priority": "Normal", "Attachments": [] }
                 }
             }
             """;
 
         // Act — run the full task workflow (parse JSON, deserialize blocks, execute each)
-        var taskInstance = GetTaskInstance();
+        var taskInstance = TestHelper.GetTaskInstance();
         var task = new GenericWorkflowTask(taskJson, taskInstance, null!);
-        await task.Run();
+        bool success = await task.Run();
 
         // Assert — read back the Excel file and verify data matches the CSV
         Assert.True(File.Exists(xlsxPath), "Excel file should have been created");

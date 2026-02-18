@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Data;
 
-namespace TaskWorkflow.TaskFactory.Tasks;
+namespace TaskWorkflow.Common.Tasks;
 
 public class TaskContext
 {

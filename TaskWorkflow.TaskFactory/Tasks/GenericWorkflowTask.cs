@@ -1,5 +1,6 @@
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.TaskFactory.Tasks.Base;
 
 
@@ -10,7 +11,7 @@ public class GenericWorkflowTask: BaseTask
     public GenericWorkflowTask(string json, TaskInstance taskInstance, IServiceProvider serviceProvider): base(json, taskInstance, serviceProvider)
     {}
 
-    public override async Task Run()
+    public override async Task<bool> Run()
     {
         foreach(var defBlock in DefinitionBlocks)
         {
@@ -28,5 +29,6 @@ public class GenericWorkflowTask: BaseTask
                 if (defBlock.OnError == eOnError.AbortTask) throw;
             }
         }
+        return true;
     }
 }

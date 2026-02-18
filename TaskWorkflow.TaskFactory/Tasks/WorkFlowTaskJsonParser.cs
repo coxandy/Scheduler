@@ -24,6 +24,7 @@ public class WorkflowTaskJsonParser
         { "ClassDefinition", typeof(ClassDefinition) },
         { "DatasourceDefinition", typeof(DatasourceDefinition) },
         { "ExcelDefinition", typeof(ExcelDefinition) },
+        { "EmailDefinition", typeof(EmailDefinition) },
         { "ExitDefinition", typeof(ExitDefinition) }
     };
 

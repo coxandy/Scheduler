@@ -2,7 +2,7 @@ using Serilog;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using TaskWorkflow.TaskFactory.Interfaces;
-using TaskWorkflow.TaskFactory.Tasks;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Helpers;

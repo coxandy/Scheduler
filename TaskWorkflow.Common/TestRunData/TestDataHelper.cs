@@ -30,8 +30,8 @@ public static class TestDataHelper
                     },
                     "ExitDefinition": {
                         "isActive": true,
-                        "success": { "email": true, "to": ["admin@test.com"], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
-                        "failure": { "email": true, "to": ["admin@test.com"], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
+                        "success": { "email": true, "to": ["admin@test.com"], "cc": [], "bcc": [], "subject": "Task Succeeded", "body": "Completed", "priority": "Normal", "attachments": [] },
+                        "failure": { "email": true, "to": ["admin@test.com"], "cc": [], "bcc": [], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
                     }
                 }
                 """;

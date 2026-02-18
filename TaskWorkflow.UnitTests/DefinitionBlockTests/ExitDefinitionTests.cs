@@ -1,4 +1,5 @@
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
+using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.TaskFactory.Tasks;
 using TaskWorkflow.Common.Models;
 using Xunit;
@@ -28,13 +29,13 @@ public class ExitDefinitionTests
         Assert.NotNull(exitDef);
         Assert.True(exitDef.IsActive);
         Assert.NotNull(exitDef.Success);
-        Assert.True(exitDef.Success.Email);
+        Assert.True(exitDef.Success.SendEmail);
         Assert.Contains("admin@test.com", exitDef.Success.To);
         Assert.Equal("Task Succeeded", exitDef.Success.Subject);
         Assert.Equal("Completed", exitDef.Success.Body);
         Assert.Equal("Normal", exitDef.Success.Priority);
         Assert.NotNull(exitDef.Failure);
-        Assert.True(exitDef.Failure.Email);
+        Assert.True(exitDef.Failure.SendEmail);
         Assert.Equal("Task Failed", exitDef.Failure.Subject);
         Assert.Equal("Error", exitDef.Failure.Body);
         Assert.Equal("High", exitDef.Failure.Priority);
@@ -98,13 +99,13 @@ public class ExitDefinitionTests
                 },
                 "ExitDefinition1": {
                     "isActive": true,
-                    "success": { "email": false, "to": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] },
-                    "failure": { "email": false, "to": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] }
+                    "success": { "email": false, "to": [], "cc": [], "bcc": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] },
+                    "failure": { "email": false, "to": [], "cc": [], "bcc": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] }
                 },
                 "ExitDefinition": {
                     "isActive": true,
-                    "success": { "email": false, "to": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] },
-                    "failure": { "email": false, "to": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] }
+                    "success": { "email": false, "to": [], "cc": [], "bcc": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] },
+                    "failure": { "email": false, "to": [], "cc": [], "bcc": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] }
                 }
             }
             """;
