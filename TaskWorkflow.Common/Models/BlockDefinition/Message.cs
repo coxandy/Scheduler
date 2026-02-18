@@ -7,11 +7,11 @@ public class Message
     public string BannerFilePath { get; set; } = String.Empty;
     public string BannerFileName { get; set; } = String.Empty;
     public string BannerOverlayText { get; set; } = String.Empty;
-    public List<string> To { get; set; }
-    public List<string> CC { get; set; }
-    public List<string> BCC { get; set; }
+    public List<string> To { get; set; } = new();
+    public List<string> CC { get; set; } = new();
+    public List<string> BCC { get; set; } = new();
     public string Subject { get; set; } = String.Empty;
     public string Body { get; set; } = String.Empty;
     public string Priority { get; set; } = String.Empty;
-    public List<string> Attachments { get; set; }
+    public List<string> Attachments { get; set; } = new();
 }

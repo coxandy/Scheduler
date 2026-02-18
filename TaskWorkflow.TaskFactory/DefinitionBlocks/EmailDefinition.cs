@@ -12,7 +12,7 @@ public class EmailDefinition : IDefinition
 {
     public bool IsActive { get; set; } = true;
     public string BlockName { get; set; } = String.Empty;
-    public eOnError OnError { get; set; } = eOnError.AbortTask;
+    public eOnError OnError { get; set; } = eOnError.AbortTaskAndReportError;
     public eTaskStatus Status { get; set; }
 
     public List<Message> Messages { get; set; } = new();
@@ -41,20 +41,9 @@ public class EmailDefinition : IDefinition
             {
                 throw new FileNotFoundException($"{bannerFullFilePath} - banner file not found");
             }
-
-            //send email with banner
-            if (!String.IsNullOrEmpty(emailMessage.BannerOverlayText))
-            {
-                //banner email with overlay text
-                await CommonEmailHelper.SendEmailAsync(emailMessage, taskContext, bannerFullFilePath: bannerFullFilePath, bannerOverlayText: emailMessage.BannerOverlayText);
-            }
-
-            //default banner email
-            await CommonEmailHelper.SendEmailAsync(emailMessage, taskContext, bannerFullFilePath: bannerFullFilePath);
         }
-        else
-        {
-            await CommonEmailHelper.SendEmailAsync(emailMessage, taskContext);    
-        }
+
+        //default banner email
+        await CommonEmailHelper.SendEmailAsync(emailMessage, taskContext);
     }
 }

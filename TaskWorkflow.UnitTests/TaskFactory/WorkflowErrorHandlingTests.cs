@@ -27,8 +27,8 @@ public class WorkflowErrorHandlingTests
             },
             "ExitDefinition": {
                 "isActive": true,
-                "success": { "email": false, "to": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] },
-                "failure": { "email": false, "to": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] }
+                "success": { "sendEmail": false, "to": [], "cc": [], "bcc": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] },
+                "failure": { "sendEmail": false, "to": [], "cc": [], "bcc": [], "subject": "", "body": "", "priority": "Normal", "attachments": [] }
             }
         }
         """;
@@ -37,6 +37,11 @@ public class WorkflowErrorHandlingTests
     {
         var mockServiceProvider = new Mock<IServiceProvider>();
         var task = new GenericWorkflowTask(_validJson, GetTaskInstance(), mockServiceProvider.Object);
+
+        // Preserve the parsed ExitDefinition so ProcessTaskErrorAsync can find it
+        var exitDef = task.GetDefinitionBlocks().OfType<ExitDefinition>().FirstOrDefault();
+        if (exitDef != null) blocks.Add(exitDef);
+
         task.SetDefinitionBlocks(blocks);
         return task;
     }
@@ -172,12 +177,12 @@ public class WorkflowErrorHandlingTests
     public async Task Run_DefaultOnError_IsAbortTask()
     {
         var classDef = new ClassDefinition();
-        Assert.Equal(eOnError.AbortTask, classDef.OnError);
+        Assert.Equal(eOnError.AbortTaskAndReportError, classDef.OnError);
 
         var exitDef = new ExitDefinition();
-        Assert.Equal(eOnError.AbortTask, exitDef.OnError);
+        Assert.Equal(eOnError.AbortTaskAndReportError, exitDef.OnError);
 
         var varDef = new VariableDefinition();
-        Assert.Equal(eOnError.AbortTask, varDef.OnError);
+        Assert.Equal(eOnError.AbortTaskAndReportError, varDef.OnError);
     }
 }

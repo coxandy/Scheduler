@@ -11,7 +11,7 @@ public class ExitDefinition: IDefinition
 {
     public bool IsActive { get; set; } = true;
     public string BlockName{ get; set; } = String.Empty;
-    public eOnError OnError { get; set; } = eOnError.AbortTask;
+    public eOnError OnError { get; set; } = eOnError.AbortTaskAndReportError;
     public Message Success { get; set; }
     public Message Failure { get; set; }
 

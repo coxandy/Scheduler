@@ -1,8 +1,6 @@
 using TaskWorkflow.Common.Models;
-using TaskWorkflow.Common.Models.BlockDefinition.Enums;
-using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.TaskFactory.Tasks.Base;
-
+using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 
 namespace TaskWorkflow.TaskFactory.Tasks;
 
@@ -25,8 +23,12 @@ public class GenericWorkflowTask: BaseTask
             catch (Exception ex)
             {
                 await ProcessTaskErrorAsync(ex, defBlock);
-                //throw exception to terminate task execution if def block is configured to eOnError.AbortTask
-                if (defBlock.OnError == eOnError.AbortTask) throw;
+
+                // Throw exception to terminate task execution if def block is configured to AbortTask or AbortTaskAndReportError
+                if ((defBlock.OnError == eOnError.AbortTaskAndReportError) || (defBlock.OnError == eOnError.AbortTask))
+                {
+                    throw;
+                }
             }
         }
         return true;

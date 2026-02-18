@@ -1,6 +1,6 @@
+using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using MimeKit;
 using MimeKit.Utils;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -22,20 +22,28 @@ public static class CommonEmailHelper
 
     public static async Task SendEmailAsync (   Message emailMessage,
                                                 TaskContext taskContext,
-                                                List<object>? chartConfigList = null,
-                                                string? bannerFullFilePath = null,
-                                                string? bannerOverlayText = null,
+                                                List<object>? chartConfigList = null,                                       
                                                 int chartWidthPercent = 100,
                                                 int chartHeightPercent = 100,
                                                 bool showChartDataTables = true)
     {
         byte[] imageBytes;
         var body = emailMessage.Body ?? string.Empty;
-
+        string bannerFullFilePath = String.Empty;
+        if (!String.IsNullOrEmpty(emailMessage.BannerFilePath) && emailMessage.IncludeBanner)
+        {
+            bannerFullFilePath = Path.Combine(emailMessage.BannerFilePath, emailMessage.BannerFileName);
+        }
 
         //Create message
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_sourceEmailName, _sourceEmail));
+
+        //Create recipient list (To, CC, BCC)
+        if ((!emailMessage.To.Any()) && (!emailMessage.CC.Any()) && (!emailMessage.BCC.Any()))
+        {
+            throw new InvalidOperationException($"Email message has no recipients");
+        }
 
         foreach (var to in emailMessage.To ?? [])
             message.To.Add(new MailboxAddress("", to));
@@ -53,17 +61,21 @@ public static class CommonEmailHelper
         var builder = new BodyBuilder();
 
         //handle header image
-        if (bannerFullFilePath != null)
+        if (!String.IsNullOrEmpty(bannerFullFilePath))
         {
             if (File.Exists(bannerFullFilePath))
             {
-                var headerBytes = bannerOverlayText != null
-                    ? OverlayTextOnImage(bannerFullFilePath, bannerOverlayText)
+                var headerBytes = emailMessage.BannerOverlayText != null
+                    ? OverlayTextOnImage(bannerFullFilePath, emailMessage.BannerOverlayText)
                     : await File.ReadAllBytesAsync(bannerFullFilePath);
 
                 var headerImage = builder.LinkedResources.Add("header.png", headerBytes);
                 headerImage.ContentId = MimeUtils.GenerateMessageId();
                 body = $@"<img src=""cid:{headerImage.ContentId}"" style=""width:100%; display:block;"" />" + body;
+            }
+            else
+            {
+                throw new FileNotFoundException($"{bannerFullFilePath} - banner file not found");
             }
         }
 
@@ -111,7 +123,7 @@ public static class CommonEmailHelper
         }
     }
 
-    public static async Task SendMessageAsync(MimeMessage message)
+    private static async Task SendMessageAsync(MimeMessage message)
     {
         using (var client = new SmtpClient())
         {
