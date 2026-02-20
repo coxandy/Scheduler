@@ -31,7 +31,7 @@ public class DatasourceDefinition: IDefinition
                 {
                     case eDatasourceTypeType.StoredProc:
                         {
-                            var connString = ConnectionStringHelper.GetConnectionString(ds.Database);
+                            var connString = CommonConnectionStringHelper.GetConnectionString(ds.Database);
                             tables = await ProcessStoredProcAsync(ds, connString); // can handle multiple recordsets
                             break;
                         }
