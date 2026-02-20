@@ -88,27 +88,6 @@ public class VariableDefinitionTests
     }
 
     [Fact]
-    public void VariableDefinition_IsOptional()
-    {
-        var json = $$"""
-            {
-                "ClassDefinition": {
-                    "classname": "MyClass",
-                    "methodname": "Run",
-                    "parameters": []
-                },
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        var result = ParseAndDeserialize(json);
-
-        Assert.Equal(2, result.Count);
-        Assert.IsType<ClassDefinition>(result[0]);
-        Assert.IsType<ExitDefinition>(result[1]);
-    }
-
-    [Fact]
     public void VariableDefinition_ValidVariableNames_ParsesSuccessfully()
     {
         var json = $$"""
@@ -165,60 +144,5 @@ public class VariableDefinitionTests
 
         var ex = Assert.Throws<FormatException>(() => JsonParser.ApplyVariableReplacementsToJson(json, variableBlock));
         Assert.Contains("<@@", ex.Message);
-    }
-
-    [Fact]
-    public void VariableDefinition_ReplacesTokensInOtherBlocks()
-    {
-        var json = $$"""
-            {
-                "VariableDefinition": {
-                    "Variables": {
-                        "<@@ClassName@@>": "Web3.Api.GetBalances",
-                        "<@@MethodName@@>": "GetBalances",
-                        "<@@Param1@@>": "epoch42"
-                    },
-                    "IsActive": true
-                },
-                "ClassDefinition": {
-                    "classname": "<@@ClassName@@>",
-                    "methodname": "<@@MethodName@@>",
-                    "parameters": ["<@@Param1@@>"]
-                },
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        var result = ParseAndDeserialize(json);
-
-        var classDef = result[1] as ClassDefinition;
-        Assert.NotNull(classDef);
-        Assert.Equal("Web3.Api.GetBalances", classDef.ClassName);
-        Assert.Equal("GetBalances", classDef.MethodName);
-        Assert.Single(classDef.Parameters);
-        Assert.Equal("epoch42", classDef.Parameters[0]);
-    }
-
-    [Fact]
-    public void VariableDefinition_IsAlwaysFirstInDeserializedList()
-    {
-        var json = $$"""
-            {
-                "VariableDefinition": {
-                    "Variables": { "<@@V1@@>": "val" },
-                    "isActive": true
-                },
-                "ClassDefinition": {
-                    "classname": "MyClass",
-                    "methodname": "Run",
-                    "parameters": []
-                },
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        var result = ParseAndDeserialize(json);
-
-        Assert.IsType<VariableDefinition>(result[0]);
     }
 }

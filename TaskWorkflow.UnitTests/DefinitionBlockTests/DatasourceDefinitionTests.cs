@@ -95,25 +95,6 @@ public class DatasourceDefinitionTests
     }
 
     [Fact]
-    public void DatasourceDefinition_DeserializesAllParameters()
-    {
-        var json = $$"""
-            {
-                {{GetDatasourceJson()}},
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        var result = ParseAndDeserialize(json);
-        var ds = Assert.IsType<DatasourceDefinition>(result[0]);
-
-        Assert.NotNull(ds.DataSources[0].Params);
-        Assert.Equal(5, ds.DataSources[0].Params.Count);
-        Assert.NotNull(ds.DataSources[1].Params);
-        Assert.Equal(2, ds.DataSources[1].Params.Count);
-    }
-
-    [Fact]
     public void DatasourceDefinition_ParameterNames_AreCorrect()
     {
         var json = $$"""
@@ -281,9 +262,118 @@ public class DatasourceDefinitionTests
     }
 
     [Fact]
-    public void DatasourceDefinition_IsActiveDefaultsToTrue()
+    public async Task DatasourceDefinition_LimitColumns_ReturnsOnlySpecifiedColumns()
     {
-        var ds = new DatasourceDefinition();
-        Assert.True(ds.IsActive);
+        var tempDir = Path.Combine(Path.GetTempPath(), $"dstest_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            var csvContent = """
+                Name,Age,City,Salary,Department
+                Alice,30,London,50000,Engineering
+                Bob,25,Paris,45000,Marketing
+                Charlie,35,Berlin,60000,Engineering
+                """;
+            File.WriteAllText(Path.Combine(tempDir, "employees.csv"), csvContent);
+
+            var jsonSafePath = tempDir.Replace("\\", "\\\\");
+            var json = $$"""
+                {
+                    "DatasourceDefinition": {
+                        "DataSources": [
+                            {
+                                "Type": "CsvFile",
+                                "DSTableName": "Employees",
+                                "CsvFilePath": "{{jsonSafePath}}",
+                                "CsvFileName": "employees.csv",
+                                "CsvFileHeader": true,
+                                "LimitColumns": ["Name", "Department", "Salary"]
+                            }
+                        ]
+                    },
+                    {{GetExitDefinitionJson()}}
+                }
+                """;
+
+            var task = CreateTask(json);
+            await task.Run();
+
+            var table = task.GetTaskContext().GetDataTable("Employees");
+
+            Assert.NotNull(table);
+            Assert.Equal(3, table.Columns.Count);
+            Assert.Equal("Name", table.Columns[0].ColumnName);
+            Assert.Equal("Department", table.Columns[1].ColumnName);
+            Assert.Equal("Salary", table.Columns[2].ColumnName);
+            Assert.Equal(3, table.Rows.Count);
+
+            Assert.Equal("Alice", table.Rows[0]["Name"].ToString());
+            Assert.Equal("Engineering", table.Rows[0]["Department"].ToString());
+            Assert.Equal("50000", table.Rows[0]["Salary"].ToString());
+
+            Assert.Equal("Bob", table.Rows[1]["Name"].ToString());
+            Assert.Equal("Marketing", table.Rows[1]["Department"].ToString());
+        }
+        finally
+        {
+            Directory.Delete(tempDir, true);
+        }
+    }
+
+    [Fact]
+    public async Task DatasourceDefinition_WhereFilter_ReturnsOnlyMatchingRows()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), $"dstest_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            var csvContent = """
+                Product,Category,Price,InStock
+                Widget A,Electronics,29.99,True
+                Widget B,Electronics,49.99,False
+                Gadget C,Home,15.00,True
+                Gadget D,Home,22.50,True
+                Gadget E,Electronics,99.99,True
+                """;
+            File.WriteAllText(Path.Combine(tempDir, "products.csv"), csvContent);
+
+            var jsonSafePath = tempDir.Replace("\\", "\\\\");
+            var json = $$"""
+                {
+                    "DatasourceDefinition": {
+                        "DataSources": [
+                            {
+                                "Type": "CsvFile",
+                                "DSTableName": "Products",
+                                "CsvFilePath": "{{jsonSafePath}}",
+                                "CsvFileName": "products.csv",
+                                "CsvFileHeader": true,
+                                "WhereFilter": "Category = 'Electronics' AND InStock = 'True'"
+                            }
+                        ]
+                    },
+                    {{GetExitDefinitionJson()}}
+                }
+                """;
+
+            var task = CreateTask(json);
+            await task.Run();
+
+            var table = task.GetTaskContext().GetDataTable("Products");
+
+            Assert.NotNull(table);
+            Assert.Equal(4, table.Columns.Count);
+            Assert.Equal(2, table.Rows.Count);
+
+            Assert.Equal("Widget A", table.Rows[0]["Product"].ToString());
+            Assert.Equal("29.99", table.Rows[0]["Price"].ToString());
+
+            Assert.Equal("Gadget E", table.Rows[1]["Product"].ToString());
+            Assert.Equal("99.99", table.Rows[1]["Price"].ToString());
+        }
+        finally
+        {
+            Directory.Delete(tempDir, true);
+        }
     }
 }

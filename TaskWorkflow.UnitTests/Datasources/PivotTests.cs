@@ -27,11 +27,11 @@ public class PivotTests
 
         // ACT
         DataTable result = CommonPivotHelper.PivotDataTable(
+                sourceTable, 
                 rows, 
                 cols, 
                 data, 
                 "PivotResult", 
-                sourceTable, 
                 "WeightedAverage", 
                 "Quantity"
         );
@@ -64,11 +64,11 @@ public class PivotTests
 
         // ACT
         DataTable result = CommonPivotHelper.PivotDataTable(
+                sourceTable,
                 new List<string> { "Store" },
                 new List<string> { "Dept" },
                 new List<string> { "Sales" },
                 "MedianTest",
-                sourceTable,
                 "Median"
         );
 
@@ -106,11 +106,11 @@ public class PivotTests
         
         // ACT
         DataTable result = CommonPivotHelper.PivotDataTable(
+                sourceTable,
                 new List<string> { "User" },
                 new List<string> { "App" },
                 new List<string> { "Score" },
                 "NullTest",
-                sourceTable,
                 "Sum"
         );
 

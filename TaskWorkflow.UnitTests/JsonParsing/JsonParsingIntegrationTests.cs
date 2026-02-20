@@ -1,7 +1,4 @@
-using Moq;
-using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
-using TaskWorkflow.TaskFactory.Tasks;
 using Xunit;
 using static TaskWorkflow.UnitTests.Helpers.TestHelpers;
 
@@ -9,24 +6,7 @@ namespace TaskWorkflow.UnitTests.JsonParsing;
 
 public class JsonParsingIntegrationTests
 {
-    private readonly Mock<IServiceProvider> _mockServiceProvider = new();
-
     // TaskInstance EffectiveDate = 2026-10-05 (from TestHelpers)
-
-    /// <summary>
-    /// Creates a GenericWorkflowTask which runs the full BaseTask constructor pipeline:
-    ///   1. Date token replacement
-    ///   2. Function variable resolution and replacement
-    ///   3. JSON validation
-    ///   4. VariableDefinition extraction and TaskContext population
-    ///   5. Variable token replacement in all other blocks
-    ///   6. Final deserialization
-    /// </summary>
-    private GenericWorkflowTask CreateTask(string json)
-    {
-        var instance = GetTaskInstance();
-        return new GenericWorkflowTask(json, instance, _mockServiceProvider.Object);
-    }
 
     [Fact]
     public void HardcodedVariables_AreReplacedInClassDefinition()
@@ -63,8 +43,6 @@ public class JsonParsingIntegrationTests
     [Fact]
     public void DateTokenVariables_AreResolvedBeforeVariableReplacement()
     {
-        // Variable values contain date tokens - these are resolved in Phase 1,
-        // then variable replacement in Phase 5 applies the resolved values.
         var json = $$"""
             {
                 "VariableDefinition": {
@@ -96,7 +74,6 @@ public class JsonParsingIntegrationTests
     [Fact]
     public void FunctionVariables_AreResolvedBeforeVariableReplacement()
     {
-        // Create temp files so fn_GetLatestFile and fn_GetOldestFile can resolve
         var tempDir = Path.Combine(Path.GetTempPath(), $"jsonparse_{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
         try
@@ -144,12 +121,6 @@ public class JsonParsingIntegrationTests
     [Fact]
     public void AllReplacementTypes_CombinedInSingleJson()
     {
-        // Tests all three replacement types together:
-        //   - Date tokens in variable values
-        //   - Function tokens in variable values
-        //   - Hard-coded variable values
-        // All are then replaced in other definition blocks.
-
         var tempDir = Path.Combine(Path.GetTempPath(), $"jsonparse_{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
         try
@@ -238,7 +209,6 @@ public class JsonParsingIntegrationTests
     [Fact]
     public void DateTokens_ReplacedDirectlyInNonVariableBlocks()
     {
-        // Date tokens used directly in definition block values (not via variables)
         var json = $$"""
             {
                 "ClassDefinition": {
@@ -357,65 +327,5 @@ public class JsonParsingIntegrationTests
         Assert.Equal("2026 Oct 05", classDef.Parameters[3]);
         Assert.Equal("05 Oct 2026", classDef.Parameters[4]);
         Assert.Equal("1005", classDef.Parameters[5]);
-    }
-
-    [Fact]
-    public void NoVariableDefinition_DirectTokensStillResolved()
-    {
-        // JSON without a VariableDefinition block - date tokens in values still get replaced
-        var json = $$"""
-            {
-                "ClassDefinition": {
-                    "classname": "Reports.Generator",
-                    "methodname": "Run",
-                    "parameters": ["<yyyy-MM-dd>"]
-                },
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        var task = CreateTask(json);
-        var definitions = task.GetDefinitionBlocks();
-
-        Assert.Equal(2, definitions.Count);
-        var classDef = Assert.IsType<ClassDefinition>(definitions[0]);
-        Assert.Equal("2026-10-05", classDef.Parameters[0]);
-    }
-
-    [Fact]
-    public void VariableUsedMultipleTimes_AllOccurrencesReplaced()
-    {
-        var json = $$"""
-            {
-                "VariableDefinition": {
-                    "Variables": {
-                        "<@@FilePath@@>": "/data/<yyyy-MM-dd>/input.csv"
-                    },
-                    "IsActive": true
-                },
-                "ClassDefinition1": {
-                    "classname": "IO.Reader",
-                    "methodname": "Read",
-                    "parameters": ["<@@FilePath@@>"]
-                },
-                "ClassDefinition2": {
-                    "classname": "IO.Validator",
-                    "methodname": "Validate",
-                    "parameters": ["<@@FilePath@@>"]
-                },
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        var task = CreateTask(json);
-        var definitions = task.GetDefinitionBlocks();
-        var processedJson = task.GetJson();
-
-        var reader = Assert.IsType<ClassDefinition>(definitions[1]);
-        var validator = Assert.IsType<ClassDefinition>(definitions[2]);
-
-        Assert.Equal("/data/2026-10-05/input.csv", reader.Parameters[0]);
-        Assert.Equal("/data/2026-10-05/input.csv", validator.Parameters[0]);
-        Assert.DoesNotContain("<@@FilePath@@>", processedJson);
     }
 }

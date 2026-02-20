@@ -4,7 +4,7 @@ using Serilog;
 
 namespace TaskWorkflow.Common.Helpers;
 
-public static class CronosHelper
+public static class CommonCronosHelper
 {
 
     public static async Task <List<ScheduledTask>> GetTasksReadyToTriggerAsync(List<ScheduledTask> scheduledTasks)

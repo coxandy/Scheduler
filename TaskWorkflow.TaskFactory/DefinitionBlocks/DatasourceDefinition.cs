@@ -43,10 +43,24 @@ public class DatasourceDefinition: IDefinition
                     default:
                         throw new ArgumentOutOfRangeException(nameof(ds.Type), $"Unknown datasource type: {ds.Type}");
                 }
+
+                // Perform any row filtering
+                if ((tables.Count == 1) && (!String.IsNullOrEmpty(ds.WhereFilter)))
+                {
+                    tables[0] = await CommonDataTableHelper.WhereFilter(tables[0], ds.WhereFilter);
+                }
+
+                // Perform any column filtering/re-ordering
+                if ((tables.Count == 1) && (ds.LimitColumns?.Any() == true))
+                {
+                    tables[0] = await CommonDataTableHelper.LimitColumns(tables[0], ds.LimitColumns);
+                }
+
                 taskContext.AddDataTables(tables);
             });
         }
     }
+
 
     private async Task<DataTable> ProcessCsvFileAsync(DataSource dataSource)
     {

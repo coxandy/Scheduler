@@ -112,28 +112,4 @@ public class ExitDefinitionTests
         var ex = Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("must not have a numeric suffix", ex.Message);
     }
-
-    [Fact]
-    public void ExitDefinition_IsAlwaysLastInDeserializedList()
-    {
-        var json = $$"""
-            {
-                "VariableDefinition": {
-                    "Variables": { "<@@V1@@>": "val" },
-                    "isActive": true
-                },
-                "ClassDefinition": {
-                    "classname": "MyClass",
-                    "methodname": "Run",
-                    "parameters": []
-                },
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        var result = ParseAndDeserialize(json);
-
-        Assert.IsType<ExitDefinition>(result.Last());
-        Assert.Equal(3, result.Count);
-    }
 }

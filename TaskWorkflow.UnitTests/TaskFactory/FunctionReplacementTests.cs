@@ -35,42 +35,9 @@ public class FunctionReplacementTests
     """;
 
     [Fact]
-    public void Json_Function_Resolve_Returns_Correct_Number_Of_Function_Matches()
+    public void MatchFunctionVariables_UnsupportedFunction_ThrowsNotSupportedException()
     {
         var instance = GetTaskInstance();
-        // _json contains fn_GetStockPrice which is unsupported, so this will throw
-        Assert.Throws<NotSupportedException>(() =>
-            CommonFunctionHelper.MatchFunctionVariables(_json, instance));
-    }
-
-    [Fact]
-    public void ParseFunctionVariable_Unsupported_Function_Throws_NotSupportedException()
-    {
-        Assert.Throws<NotSupportedException>(() =>
-            CommonFunctionHelper.ParseFunctionVariable(@"<fn_GetStockPrice(""AAPL.L"")>"));
-    }
-
-    [Fact]
-    public void ParseFunctionVariable_Extracts_MultipleParams_Before_Invoke()
-    {
-        // fn_DateAdd is not supported, so this will throw - but we can test InvokeFunction directly
-        Assert.Throws<NotSupportedException>(() =>
-            CommonFunctionHelper.ParseFunctionVariable("<fn_DateAdd(7, days, 2026-01-01)>"));
-    }
-
-    [Fact]
-    public void ParseFunctionVariable_NoParams_Unsupported_Function_Throws()
-    {
-        Assert.Throws<NotSupportedException>(() =>
-            CommonFunctionHelper.ParseFunctionVariable("<fn_GetCurrentDate()>"));
-    }
-
-    [Fact]
-    public void MatchFunctionVariables_Returns_Parsed_FunctionNames()
-    {
-        var instance = GetTaskInstance();
-        // MatchFunctionVariables calls ParseFunctionVariable which now invokes functions.
-        // fn_GetStockPrice is unsupported, so this will throw.
         Assert.Throws<NotSupportedException>(() =>
             CommonFunctionHelper.MatchFunctionVariables(_json, instance));
     }

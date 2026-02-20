@@ -33,7 +33,7 @@ public class TaskWorkflowSchedulerService : BackgroundService
             }
 
             // determine which tasks are ready to trigger
-            var tasksToTrigger = await CronosHelper.GetTasksReadyToTriggerAsync(scheduledTasks);
+            var tasksToTrigger = await CommonCronosHelper.GetTasksReadyToTriggerAsync(scheduledTasks);
 
             // run those tasks that are scheduled
             var triggerTasks = tasksToTrigger.Select(async scheduledTask =>

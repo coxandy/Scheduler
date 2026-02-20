@@ -1,6 +1,6 @@
 namespace TaskWorkflow.Common.Helpers;
 
-public static class ConnectionStringHelper
+public static class CommonConnectionStringHelper
 {
     private static Dictionary<string, string> _connectionStrings = new(StringComparer.OrdinalIgnoreCase);
 

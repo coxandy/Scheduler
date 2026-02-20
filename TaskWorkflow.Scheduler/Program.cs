@@ -33,7 +33,7 @@ public class Program
 
         var webServers = builder.Configuration.GetSection("Scheduler:WebServers").Get<List<string>>() ?? new();
         var port = builder.Configuration.GetValue<int>("Scheduler:Port");
-        UriHelper.Initialize(webServers, port);
+        CommonUriHelper.Initialize(webServers, port);
 
         builder.Services.AddSerilog();
         builder.Services.AddWindowsService();

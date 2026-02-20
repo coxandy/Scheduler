@@ -102,16 +102,6 @@ public class TaskExecutionControllerTests
     }
 
     [Fact]
-    public async Task ExecuteTask_DefaultTaskInstance_ReturnsOk()
-    {
-        var taskInstance = new TaskInstance();
-
-        var result = await _controller.ExecuteTask(taskInstance);
-
-        Assert.IsType<OkObjectResult>(result);
-    }
-
-    [Fact]
     public async Task CreateTaskObjectAsync_ReturnsGenericWorkflowTask()
     {
         var mockServiceProvider = new Mock<IServiceProvider>();

@@ -1,6 +1,6 @@
 
 
-public static class UriHelper
+public static class CommonUriHelper
 {
     public static List<string> AvailableWebServers { get; private set; } = new();
     public static int Port { get; private set; }

@@ -23,6 +23,10 @@ public static class CommonEmailHelper
                                                 int chartHeightPercent = 100,
                                                 bool showChartDataTables = true)
     {
+        
+        //Message configured not to send email
+        if (!emailMessage.SendEmail) return;
+
         byte[] imageBytes;
         var body = emailMessage.Body ?? string.Empty;
         string bannerFullFilePath = String.Empty;
@@ -36,7 +40,10 @@ public static class CommonEmailHelper
         message.From.Add(new MailboxAddress(emailSettings.SenderName, emailSettings.SenderEmail));
 
         //Create recipient list (To, CC, BCC)
-        if ((!emailMessage.To.Any()) && (!emailMessage.CC.Any()) && (!emailMessage.BCC.Any()))
+        if ((!emailMessage.To.Any()) && 
+                (!emailMessage.CC.Any()) && 
+                    (!emailMessage.BCC.Any()) && 
+                        emailMessage.SendEmail)
         {
             throw new InvalidOperationException($"Email message has no recipients");
         }

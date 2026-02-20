@@ -6,11 +6,11 @@ public static class CommonPivotHelper
 {
 
     public static DataTable PivotDataTable(
+        DataTable sourceTable,
         List<string> Rows,
         List<string> Cols,
         List<string> Data,
         string TableName,
-        DataTable sourceTable,
         string AggregateFunction = "Sum",
         string WeightColumn = null) // Optional parameter for Weighted Average
     {

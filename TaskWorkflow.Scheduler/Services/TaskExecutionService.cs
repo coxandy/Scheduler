@@ -35,14 +35,14 @@ public class TaskExecutionService : ITaskExecutionService
 
     private async Task<HttpResponseMessage?> PostScheduledTask(string json, string webService)
     {
-        var serverCount = UriHelper.AvailableWebServers.Count;
-        var primaryIndex = UriHelper.GetServerIndex(webService);
+        var serverCount = CommonUriHelper.AvailableWebServers.Count;
+        var primaryIndex = CommonUriHelper.GetServerIndex(webService);
 
         // If the HttpPost call fails retry against the other available servers
         for (int attempt = 0; attempt < serverCount; attempt++)
         {
             int serverIndex = (primaryIndex + attempt) % serverCount;
-            string url = $"{UriHelper.GetUriForServer(serverIndex)}/TaskExecution/ExecuteTask";
+            string url = $"{CommonUriHelper.GetUriForServer(serverIndex)}/TaskExecution/ExecuteTask";
 
             Log.Information($"Posting task '{webService}' to {url} (attempt {attempt + 1} of {serverCount})");
             var response = await Post(json, url, webService, attempt + 1, serverCount);

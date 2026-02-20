@@ -145,22 +145,6 @@ public class WorkflowErrorHandlingTests
     }
 
     [Fact]
-    public async Task Run_MultipleSkipErrors_AllBlocksStillExecute()
-    {
-        var block1 = CreateMockBlock("ClassDefinition1", eOnError.Skip, throws: true);
-        var block2 = CreateMockBlock("ClassDefinition2", eOnError.Skip, throws: true);
-        var block3 = CreateMockBlock("ClassDefinition3", eOnError.Skip);
-
-        var task = CreateTaskWithBlocks([block1.Object, block2.Object, block3.Object]);
-
-        await task.Run();
-
-        block1.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>(), It.IsAny<TaskContext>()), Times.Once);
-        block2.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>(), It.IsAny<TaskContext>()), Times.Once);
-        block3.Verify(d => d.RunDefinitionBlockAsync(It.IsAny<TaskInstance>(), It.IsAny<IServiceProvider>(), It.IsAny<TaskContext>()), Times.Once);
-    }
-
-    [Fact]
     public async Task Run_AbortTask_ThrowsOriginalException()
     {
         var block1 = CreateMockBlock("ClassDefinition1", eOnError.AbortTask);

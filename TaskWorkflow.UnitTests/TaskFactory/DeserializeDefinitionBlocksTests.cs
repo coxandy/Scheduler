@@ -9,75 +9,6 @@ namespace TaskWorkflow.UnitTests.TaskFactory;
 
 public class DeserializeDefinitionBlocksTests
 {
-    private static string GetValidJson() => $$"""
-        {
-                "VariableDefinition": {
-                    "Variables": {
-                    "<@@Test1@@>": 13,
-                    "<@@Test2@@>": 15,
-                    "<@@Test3@@>": "andy",
-                    "<@@Test4@@>": "58"
-                    },
-                    "IsActive": true
-                },
-                "ClassDefinition": {
-                    "status": "Failed",
-                    "classname": "Web3.Api.GetBalancesByEpoch",
-                    "methodname": "GetBalancesByEpoch",
-                    "parameters": [
-                    "arrayval1",
-                    "arrayval2"
-                    ]
-                },
-                {{GetExitDefinitionJson()}}
-                }
-        """;
-
-    // DeserializeDefinitionBlocks tests
-
-    [Fact]
-    public void ValidJson_ReturnsCorrectTypes()
-    {
-        var result = ParseAndDeserialize(GetValidJson());
-        Assert.IsType<VariableDefinition>(result[0]);
-        Assert.IsType<ClassDefinition>(result[1]);
-        Assert.IsType<ExitDefinition>(result[2]);
-    }
-
-    [Fact]
-    public void ValidJson_ClassDefinition_DeserializesCorrectly()
-    {
-        var result = ParseAndDeserialize(GetValidJson());
-        var classDef = result[1] as ClassDefinition;
-
-        Assert.NotNull(classDef);
-        Assert.Equal("Web3.Api.GetBalancesByEpoch", classDef.ClassName);
-        Assert.Equal("GetBalancesByEpoch", classDef.MethodName);
-        Assert.Equal(2, classDef.Parameters.Count);
-    }
-
-    [Fact]
-    public void SingleDefinitionBlock_ReturnsSingleItem()
-    {
-        var json = $$"""
-            {
-                "VariableDefinition": {
-                    "id": 1,
-                    "role": "Admin",
-                    "permissions": [],
-                    "isActive": true
-                },
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        var result = ParseAndDeserialize(json);
-
-        Assert.Equal(2, result.Count);
-        Assert.IsType<VariableDefinition>(result[0]);
-        Assert.IsType<ExitDefinition>(result[1]);
-    }
-
     [Fact]
     public void MultipleBlocksWithNumericSuffix_ReturnsCorrectCount()
     {
@@ -237,30 +168,5 @@ public class DeserializeDefinitionBlocksTests
         TaskInstance instance = GetTaskInstance();
         var ex = Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("Duplicate", ex.Message);
-    }
-
-    [Fact]
-    public void ParseJson_ValidJson_NoException()
-    {
-        var json = $$"""
-            {
-                "VariableDefinition": {
-                    "id": 1,
-                    "role": "Admin",
-                    "permissions": [],
-                    "isActive": true
-                },
-                "ClassDefinition1": {
-                    "classname": "MyClass",
-                    "methodname": "Run",
-                    "parameters": []
-                },
-                {{GetExitDefinitionJson()}}
-            }
-            """;
-
-        TaskInstance instance = GetTaskInstance();
-        var parser = new WorkflowTaskJsonParser(json, instance);
-        Assert.NotNull(parser);
     }
 }

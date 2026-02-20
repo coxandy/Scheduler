@@ -26,7 +26,7 @@ public class Program
 
         var webServers = configuration.GetSection("Scheduler:WebServers").Get<List<string>>() ?? new();
         var port = configuration.GetValue<int>("Scheduler:Port");
-        UriHelper.Initialize(webServers, port);
+        CommonUriHelper.Initialize(webServers, port);
 
         var environmentName = configuration.GetValue<string>("Environment") ?? "Development";
 

@@ -1,3 +1,4 @@
+using Moq;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
@@ -8,6 +9,8 @@ namespace TaskWorkflow.UnitTests.Helpers;
 
 internal static class TestHelpers
 {
+    private static readonly Mock<IServiceProvider> _mockServiceProvider = new();
+
     internal static TaskInstance GetTaskInstance() => new TaskInstance
     {
         EffectiveDate = new DateTime(2026, 10, 5),
@@ -23,6 +26,12 @@ internal static class TestHelpers
                     "failure": { "email": true, "to": ["admin@test.com"], "cc": [], "bcc": [], "subject": "Task Failed", "body": "Error", "priority": "High", "attachments": [] }
                 }
         """;
+
+    internal static GenericWorkflowTask CreateTask(string json)
+    {
+        var instance = GetTaskInstance();
+        return new GenericWorkflowTask(json, instance, _mockServiceProvider.Object);
+    }
 
     internal static List<IDefinition> ParseAndDeserialize(string json)
     {
