@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TaskWorkflow.Common.Helpers;
+using TaskWorkflow.Common.Models;
 using TaskWorkflow.TaskFactory.DefinitionBlocks;
 using TaskWorkflow.TaskFactory.Interfaces;
 using System.Text.RegularExpressions;
@@ -10,8 +11,7 @@ namespace TaskWorkflow.TaskFactory.Tasks;
 public class WorkflowTaskJsonParser
 {
     private string _json = String.Empty;
-    private DateTime _effectiveDate;
-    private string _environmentName;
+    private readonly TaskInstance _taskInstance;
     private  readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -24,28 +24,18 @@ public class WorkflowTaskJsonParser
         { "ClassDefinition", typeof(ClassDefinition) },
         { "DatasourceDefinition", typeof(DatasourceDefinition) },
         { "ExcelDefinition", typeof(ExcelDefinition) },
+        { "PivotDefinition", typeof(PivotDefinition) },
         { "GroqDefinition", typeof(GroqDefinition) },
         { "EmailDefinition", typeof(EmailDefinition) },
         { "ExitDefinition", typeof(ExitDefinition) }
     };
 
-    public WorkflowTaskJsonParser (string json, DateTime effectiveDate, string environmentName)
+    public WorkflowTaskJsonParser (string json, TaskInstance taskInstance)
     {
         _json = json;
-        _effectiveDate = effectiveDate;
-        _environmentName = environmentName;
+        _taskInstance = taskInstance;
+        VerifyJson();
     }
-
-    public VariableDefinition VerifyJson()
-    {
-        // Replace any '<>' tokens if the exist
-        _json = JsonParsingHelper.ReplaceToken(_json, _effectiveDate, _environmentName);
-        // Verify DefinitionBlock Json is valid
-        VerifyJson(_json);
-        // Return Variable Defintion Block if it exists
-        return DeserializeVariableDefinitionBlock(_json);
-    }
-
 
     public List<IDefinition> GetDefinitionBlocks()
     {
@@ -53,15 +43,15 @@ public class WorkflowTaskJsonParser
         return definitionBlockList;
     }
 
-    public void VerifyJson(string json)
+    public void VerifyJson()
     {
-        if (string.IsNullOrWhiteSpace(json))
-            throw new ArgumentException("JSON cannot be null or empty.", nameof(json));
+        if (string.IsNullOrWhiteSpace(_json))
+            throw new ArgumentException("JSON cannot be null or empty.", nameof(_json));
 
         JsonDocument document;
         try
         {
-            document = JsonDocument.Parse(json);
+            document = JsonDocument.Parse(_json);
         }
         catch (JsonException ex)
         {
@@ -115,7 +105,7 @@ public class WorkflowTaskJsonParser
                 throw new FormatException($"Duplicate definition block '{propertyName}'.");
             }
 
-            var baseName = JsonParsingHelper.GetBaseDefinitionName(propertyName);
+            var baseName = CommonJsonParsingHelper.GetBaseDefinitionName(propertyName);
 
             if (!_definitionBlockTypeMap.TryGetValue(baseName, out _))
             {
@@ -140,12 +130,12 @@ public class WorkflowTaskJsonParser
     }
 
     //Special case
-    public VariableDefinition DeserializeVariableDefinitionBlock(string json)
+    public VariableDefinition DeserializeVariableDefinitionBlock(TaskInstance taskInstance)
     {
         JsonDocument document;
         try
         {
-            document = JsonDocument.Parse(json);
+            document = JsonDocument.Parse(_json);
         }
         catch (JsonException ex)
         {
@@ -159,9 +149,8 @@ public class WorkflowTaskJsonParser
 
             if (property.Value.ValueKind != JsonValueKind.Undefined) 
             {
-                var baseName = JsonParsingHelper.GetBaseDefinitionName(property.Name);
+                var baseName = CommonJsonParsingHelper.GetBaseDefinitionName(property.Name);
                 var definitionType = _definitionBlockTypeMap[baseName];
-
                 var rawJson = property.Value.GetRawText();
                 var definition = JsonSerializer.Deserialize(rawJson, definitionType, _jsonOptions) as VariableDefinition ?? throw new FormatException($"Failed to deserialize '{property.Name}' into {definitionType.Name}.");
                 return definition;               
@@ -192,7 +181,7 @@ public class WorkflowTaskJsonParser
 
             foreach (var property in root.EnumerateObject())
             {
-                var baseName = JsonParsingHelper.GetBaseDefinitionName(property.Name);
+                var baseName = CommonJsonParsingHelper.GetBaseDefinitionName(property.Name);
                 string PropertyJson = $"\"{property.Name}\":{property.Value.GetRawText()},";
 
                 if (String.Compare(baseName, "VariableDefinition", StringComparison.OrdinalIgnoreCase) != 0)
@@ -213,7 +202,7 @@ public class WorkflowTaskJsonParser
     {
         var variablesToReplace = variableDefinition.Variables;
 
-        if (variableDefinition.Variables.Keys.Any(x => !Regex.IsMatch(x, JsonParsingHelper.VariablNamePattern)))
+        if (variableDefinition.Variables.Keys.Any(x => !Regex.IsMatch(x, CommonJsonParsingHelper.VariableNamePattern)))
         {
             throw new FormatException($"Variable names should be formatted with '<@@' + name + '@@>'  (e.g. '<@@ProductId@@>')");
         }
@@ -222,9 +211,11 @@ public class WorkflowTaskJsonParser
         {
             foreach(var variable in variablesToReplace)
             {
-                if (variable.Value != null) 
+                if (variable.Value != null)
                 {
-                    json = JsonParsingHelper.ReplaceVariablesInJson(json, variable.Key.ToString(), variable.Value.ToString());
+                    // Escape backslashes for JSON compatibility (e.g. Windows file paths)
+                    var value = variable.Value.ToString().Replace("\\", "\\\\");
+                    json = CommonJsonParsingHelper.ReplaceVariablesInJson(json, variable.Key.ToString(), value);
                 }
             }
         }
@@ -249,7 +240,7 @@ public class WorkflowTaskJsonParser
 
             foreach (var property in root.EnumerateObject())
             {
-                var baseName = JsonParsingHelper.GetBaseDefinitionName(property.Name);
+                var baseName = CommonJsonParsingHelper.GetBaseDefinitionName(property.Name);
                 var definitionType = _definitionBlockTypeMap[baseName];
 
                 var rawJson = property.Value.GetRawText();

@@ -30,6 +30,7 @@ public abstract class BaseTask
     public abstract Task Run();
 
     // Internal accessors for unit testing
+    internal string GetJson() => _json;
     internal List<IDefinition> GetDefinitionBlocks() => DefinitionBlocks;
     internal void SetDefinitionBlocks(List<IDefinition> blocks) => DefinitionBlocks = blocks;
     internal TaskContext GetTaskContext() => TaskContext;
@@ -41,14 +42,24 @@ public abstract class BaseTask
         _json = json;
         this.Instance = taskInstance;
         this.ServiceProvider = serviceProvider;
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(_json, taskInstance.EffectiveDate, taskInstance.EnvironmentName);
-        
+
+        // In Json replace any '<>' tokens if the exist
+        _json = CommonJsonParsingHelper.ReplaceTokens(_json, taskInstance);
+
+        // In json resolve and replace function variable values
+        _json = CommonFunctionHelper.ResolveAndReplaceFunctionVariables(_json, taskInstance);
+
+        // Verify json is valid
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(_json, taskInstance);
+
+        // Get variable defintion block
+        VariableDefinition VariableDefinitionBlock = JsonParser.DeserializeVariableDefinitionBlock(taskInstance);
+
         //====================================================================================
         // VariableDefinition is exceptional because it has to be processed prior to the 
         // Task Json being deserialized into definition blocks
         // Verify Json format and return VariableDefintion if it exists
         //====================================================================================
-        VariableDefinition VariableDefinitionBlock = JsonParser.VerifyJson();
         if (VariableDefinitionBlock != null)
         {
             // Assign variables to TaskContext

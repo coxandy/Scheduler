@@ -38,7 +38,7 @@ public class TokenReplacementTests
     public void Json_Token_ReturnsCorrectTokenReplacementValue()
     {
         var instance = GetTaskInstance();
-        string json = JsonParsingHelper.ReplaceToken(_json, instance.EffectiveDate, instance.EnvironmentName);
+        string json = CommonJsonParsingHelper.ReplaceTokens(_json, instance);
         var result = ParseAndDeserialize(json);
         Assert.Equal(3, result.Count);
     }

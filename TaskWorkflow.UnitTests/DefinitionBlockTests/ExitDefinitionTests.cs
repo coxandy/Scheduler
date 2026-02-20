@@ -59,8 +59,7 @@ public class ExitDefinitionTests
             """;
 
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        var ex = Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("ExitDefinition missing", ex.Message);
     }
 
@@ -83,8 +82,7 @@ public class ExitDefinitionTests
             """;
 
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        var ex = Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("ExitDefinition should always be the last definition block", ex.Message);
     }
 
@@ -111,8 +109,7 @@ public class ExitDefinitionTests
             """;
 
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        var ex = Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("must not have a numeric suffix", ex.Message);
     }
 

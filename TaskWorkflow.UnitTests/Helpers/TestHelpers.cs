@@ -27,12 +27,12 @@ internal static class TestHelpers
     internal static List<IDefinition> ParseAndDeserialize(string json)
     {
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        VariableDefinition VariableDefinitionBlock = JsonParser.VerifyJson();
-        if (VariableDefinitionBlock != null)
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance);
+        VariableDefinition variableBlock = JsonParser.DeserializeVariableDefinitionBlock(instance);
+        if (variableBlock != null)
         {
-            var variables = VariableDefinitionBlock.Variables;
-            json = JsonParser.ApplyVariableReplacementsToJson(json, VariableDefinitionBlock);
+            var variables = variableBlock.Variables;
+            json = JsonParser.ApplyVariableReplacementsToJson(json, variableBlock);
         }
         return JsonParser.DeserializeDefinitionBlocks(json);
     }

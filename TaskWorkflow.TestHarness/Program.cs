@@ -21,6 +21,7 @@ public class Program
         var configuration = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.Development.json", optional: true)
             .Build();
 
         var webServers = configuration.GetSection("Scheduler:WebServers").Get<List<string>>() ?? new();

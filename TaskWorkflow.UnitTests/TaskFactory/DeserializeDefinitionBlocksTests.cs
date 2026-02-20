@@ -158,40 +158,35 @@ public class DeserializeDefinitionBlocksTests
     public void ParseJson_NullJson_ThrowsArgumentException()
     {
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(null!, instance.EffectiveDate, instance.EnvironmentName);
-        Assert.Throws<ArgumentException>(() => JsonParser.VerifyJson());
+        Assert.Throws<ArgumentException>(() => new WorkflowTaskJsonParser(null!, instance));
     }
 
     [Fact]
     public void ParseJson_EmptyJson_ThrowsArgumentException()
     {
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("", instance.EffectiveDate, instance.EnvironmentName);
-        Assert.Throws<ArgumentException>(() => JsonParser.VerifyJson());
+        Assert.Throws<ArgumentException>(() => new WorkflowTaskJsonParser("", instance));
     }
 
     [Fact]
     public void ParseJson_InvalidJson_ThrowsFormatException()
     {
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("not valid json", instance.EffectiveDate, instance.EnvironmentName);
-        Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser("not valid json", instance));
     }
 
     [Fact]
     public void ParseJson_JsonArray_ThrowsFormatException()
     {
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("[]", instance.EffectiveDate, instance.EnvironmentName);
-        Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser("[]", instance));
     }
 
     [Fact]
     public void ParseJson_EmptyObject_ThrowsFormatException()
     {
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser("{}", instance.EffectiveDate, instance.EnvironmentName);
-        Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser("{}", instance));
     }
 
     [Fact]
@@ -210,8 +205,7 @@ public class DeserializeDefinitionBlocksTests
             }
             """;
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        var ex = Assert.Throws<KeyNotFoundException>(() => JsonParser.VerifyJson());
+        var ex = Assert.Throws<KeyNotFoundException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("UnknownDefinition", ex.Message);
     }
 
@@ -241,8 +235,7 @@ public class DeserializeDefinitionBlocksTests
             """;
 
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        var ex = Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("Duplicate", ex.Message);
     }
 
@@ -267,8 +260,7 @@ public class DeserializeDefinitionBlocksTests
             """;
 
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        JsonParser.VerifyJson(json);
-        Assert.True(true);
+        var parser = new WorkflowTaskJsonParser(json, instance);
+        Assert.NotNull(parser);
     }
 }

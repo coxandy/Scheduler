@@ -65,8 +65,7 @@ public class VariableDefinitionTests
             """;
 
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        var ex = Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("VariableDefinition should always be the first definition block", ex.Message);
     }
 
@@ -84,8 +83,7 @@ public class VariableDefinitionTests
             """;
 
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        var ex = Assert.Throws<FormatException>(() => JsonParser.VerifyJson());
+        var ex = Assert.Throws<FormatException>(() => new WorkflowTaskJsonParser(json, instance));
         Assert.Contains("must not have a numeric suffix", ex.Message);
     }
 
@@ -161,8 +159,8 @@ public class VariableDefinitionTests
             """;
 
         TaskInstance instance = GetTaskInstance();
-        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance.EffectiveDate, instance.EnvironmentName);
-        VariableDefinition variableBlock = JsonParser.VerifyJson();
+        WorkflowTaskJsonParser JsonParser = new WorkflowTaskJsonParser(json, instance);
+        VariableDefinition variableBlock = JsonParser.DeserializeVariableDefinitionBlock(instance);
         Assert.NotNull(variableBlock);
 
         var ex = Assert.Throws<FormatException>(() => JsonParser.ApplyVariableReplacementsToJson(json, variableBlock));
