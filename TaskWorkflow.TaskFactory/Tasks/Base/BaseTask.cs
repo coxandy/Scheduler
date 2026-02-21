@@ -76,6 +76,10 @@ public abstract class BaseTask
         this.DefinitionBlocks = JsonParser.DeserializeDefinitionBlocks(_json);
     }
 
+    protected async Task ResolveRunTimeVariablesTaskErrorAsync(IDefinition defBlock)
+    {
+    }
+
     // Process any definition block errors by sending email
     protected async Task ProcessTaskErrorAsync(Exception ex, IDefinition defBlock)
     {

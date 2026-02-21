@@ -17,6 +17,9 @@ public class GenericWorkflowTask: BaseTask
             {
                 if (defBlock.IsActive)
                 {
+                    string blockName = defBlock.BlockName;
+                    string json = GetJson();
+                    await ResolveRunTimeVariablesTaskErrorAsync(defBlock);
                     await defBlock.RunDefinitionBlockAsync(this.Instance, this.ServiceProvider, this.TaskContext);
                 }
             }

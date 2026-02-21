@@ -15,7 +15,7 @@ public class ExcelDefinition: IDefinition
     public bool IsActive { get; set; } = true;
     public string BlockName{ get; set; } = String.Empty;
     public eOnError OnError { get; set; } = eOnError.AbortTaskAndReportError;
-    public eTaskStatus Status { get; set; }
+    
 
     public List<Spreadsheet> Spreadsheets { get; set; } = new();
 

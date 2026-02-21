@@ -45,7 +45,7 @@ public class Program
         var connectionStrings = builder.Configuration.GetSection("ConnectionStrings")
             .GetChildren()
             .ToDictionary(x => x.Key, x => x.Value ?? string.Empty, StringComparer.OrdinalIgnoreCase);
-        ConnectionStringHelper.Initialize(connectionStrings);
+        CommonConnectionStringHelper.Initialize(connectionStrings);
 
         app.MapControllers();
 

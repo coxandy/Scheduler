@@ -12,7 +12,7 @@ public class ClassDefinition: IDefinition
     public bool IsActive { get; set; } = true;
     public string BlockName{ get; set; } = String.Empty;
     public eOnError OnError { get; set; } = eOnError.AbortTaskAndReportError;
-    public eTaskStatus Status { get; set; }
+    
 
     [JsonPropertyName("classname")]
     public string ClassName { get; set; }

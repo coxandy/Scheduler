@@ -132,29 +132,12 @@ public class WorkflowTaskJsonParser
     //Special case
     public VariableDefinition DeserializeVariableDefinitionBlock(TaskInstance taskInstance)
     {
-        JsonDocument document;
-        try
+        string propertyJson = CommonDefinitionBlockHelper.GetDefinitionBlockJson(_json, "VariableDefinition");
+        if (!String.IsNullOrEmpty(propertyJson))
         {
-            document = JsonDocument.Parse(_json);
-        }
-        catch (JsonException ex)
-        {
-            throw new FormatException($"Invalid JSON format: {ex.Message}", ex);
-        }
-
-        using (document)
-        {
-            var root = document.RootElement;
-            var property = document.RootElement.EnumerateObject().FirstOrDefault(p => string.Equals(p.Name, "VariableDefinition", StringComparison.OrdinalIgnoreCase));
-
-            if (property.Value.ValueKind != JsonValueKind.Undefined) 
-            {
-                var baseName = CommonJsonParsingHelper.GetBaseDefinitionName(property.Name);
-                var definitionType = _definitionBlockTypeMap[baseName];
-                var rawJson = property.Value.GetRawText();
-                var definition = JsonSerializer.Deserialize(rawJson, definitionType, _jsonOptions) as VariableDefinition ?? throw new FormatException($"Failed to deserialize '{property.Name}' into {definitionType.Name}.");
-                return definition;               
-            }
+            var definitionType = _definitionBlockTypeMap["VariableDefinition"];
+            var definition = JsonSerializer.Deserialize(propertyJson, definitionType, _jsonOptions) as VariableDefinition ?? throw new FormatException($"Failed to deserialize 'VariableDefinition' into {definitionType.Name}.");
+            return definition;               
         }
         return null;
     }

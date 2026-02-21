@@ -14,7 +14,8 @@ public class GroqDefinition : IDefinition
     public bool IsActive { get; set; } = true;
     public string BlockName { get; set; } = string.Empty;
     public eOnError OnError { get; set; } = eOnError.AbortTaskAndReportError;
-    public eTaskStatus Status { get; set; }
+    
+    
 
     public List<GroqQuestion> Questions { get; set; } = new();
 

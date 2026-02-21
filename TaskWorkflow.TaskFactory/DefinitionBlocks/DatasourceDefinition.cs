@@ -15,7 +15,7 @@ public class DatasourceDefinition: IDefinition
     public bool IsActive { get; set; } = true;
     public string BlockName{ get; set; } = String.Empty;
     public eOnError OnError { get; set; } = eOnError.AbortTaskAndReportError;
-    public eTaskStatus Status { get; set; }
+    
 
     public List<DataSource> DataSources { get; set; }
 
@@ -31,7 +31,7 @@ public class DatasourceDefinition: IDefinition
                 {
                     case eDatasourceTypeType.StoredProc:
                         {
-                            var connString = ConnectionStringHelper.GetConnectionString(ds.Database);
+                            var connString = CommonConnectionStringHelper.GetConnectionString(ds.Database);
                             tables = await ProcessStoredProcAsync(ds, connString); // can handle multiple recordsets
                             break;
                         }
