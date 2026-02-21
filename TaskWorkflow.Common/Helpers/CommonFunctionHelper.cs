@@ -7,7 +7,10 @@ namespace TaskWorkflow.Common.Helpers;
 
 public static class CommonFunctionHelper
 {
-    private static string FunctionNamePattern = @"<fn_.*?\(.*?\)>";
+    // Matches <fn_...()> tokens but deliberately excludes <fn_runtime...> tokens which are
+    // resolved at block-execution time by CommonRuntimeFunctionHelper, not at parse time.
+    // Note: no \b after 'runtime' — fn_runtime_xxx has no word boundary after 'runtime'.
+    private static string FunctionNamePattern = @"<fn_(?!runtime).*?\(.*?\)>";
 
     public static string ResolveAndReplaceFunctionVariables(string json, TaskInstance taskInstance)
     {

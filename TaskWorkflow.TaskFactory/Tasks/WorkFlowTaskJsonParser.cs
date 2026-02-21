@@ -21,6 +21,7 @@ public class WorkflowTaskJsonParser
     private readonly Dictionary<string, Type> _definitionBlockTypeMap = new(StringComparer.OrdinalIgnoreCase)
     {
         { "VariableDefinition", typeof(VariableDefinition) },
+        { "IfDefinition", typeof(IfDefinition) },
         { "ClassDefinition", typeof(ClassDefinition) },
         { "DatasourceDefinition", typeof(DatasourceDefinition) },
         { "ExcelDefinition", typeof(ExcelDefinition) },
