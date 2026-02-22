@@ -28,6 +28,7 @@ public class WorkflowTaskJsonParser
         { "PivotDefinition", typeof(PivotDefinition) },
         { "GroqDefinition", typeof(GroqDefinition) },
         { "EmailDefinition", typeof(EmailDefinition) },
+        { "FileDefinition", typeof(FileDefinition) },
         { "ExitDefinition", typeof(ExitDefinition) }
     };
 
