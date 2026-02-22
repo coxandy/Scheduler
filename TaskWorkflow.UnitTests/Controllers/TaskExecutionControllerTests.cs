@@ -71,7 +71,7 @@ public class TaskExecutionControllerTests
                 CronExpression = "*/5 * * * *",
                 Description = "Test task description",
                 LastRunTime = DateTime.Now.AddMinutes(-10),
-                Status = "Completed",
+                Status = eTaskStatus.Completed,
                 DayOffset = -1,
                 TaskJsonDefinitionId = 100
             }

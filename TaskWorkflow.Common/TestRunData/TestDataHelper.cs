@@ -1,5 +1,6 @@
 using TaskWorkflow.Common.Helpers;
 using TaskWorkflow.Common.Models;
+using TaskWorkflow.Common.Models.BlockDefinition.Enums;
 
 namespace TaskWorkflow.Common.TestRunData;
 
@@ -56,7 +57,7 @@ public static class TestDataHelper
                     TaskName = fields[3],
                     Description = fields[4],
                     LastRunTime = Convert.ToDateTime(fields[5]),
-                    Status = fields[6],
+                    Status = Enum.Parse<eTaskStatus>(fields[6]),
                     WebService = fields[7],
                     DayOffset= Convert.ToInt32(fields[8])
                 });

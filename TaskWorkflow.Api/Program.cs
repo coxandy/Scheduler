@@ -30,8 +30,12 @@ public class Program
 
         Log.Information("Starting in {Environment} environment", builder.Environment.EnvironmentName);
 
+        builder.Host.UseWindowsService(options =>
+        {
+            options.ServiceName = "TaskWorkflow API";
+        });
+
         builder.Services.AddSerilog();
-        builder.Services.AddWindowsService();
         builder.Services.AddControllers();
 
         // Add app services to DI

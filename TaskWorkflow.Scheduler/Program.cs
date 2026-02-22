@@ -35,10 +35,15 @@ public class Program
         var port = builder.Configuration.GetValue<int>("Scheduler:Port");
         CommonUriHelper.Initialize(webServers, port);
 
+        builder.Services.AddWindowsService(options =>
+        {
+            options.ServiceName = "TaskWorkflow Scheduler";
+        });
+
         builder.Services.AddSerilog();
-        builder.Services.AddWindowsService();
         builder.Services.AddHttpClient();
-        builder.Services.AddTransient<ITaskExecutionService,TaskExecutionService>();
+        builder.Services.AddTransient<ITaskExecutionService, TaskExecutionService>();
+        builder.Services.AddTransient<ITaskDatabaseService, TaskDatabaseService>();
         builder.Services.AddHostedService<TaskWorkflowSchedulerService>();
         var host = builder.Build();
 

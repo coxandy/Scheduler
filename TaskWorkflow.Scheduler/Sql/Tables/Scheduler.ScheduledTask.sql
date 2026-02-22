@@ -1,10 +1,16 @@
 USE Scheduler
 GO
 
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'ScheduledTask')
+BEGIN
+    DROP TABLE ScheduledTask;
+END
+GO
+
 
 -- 1. Create the table structure aligned with C# ScheduledTask class
 CREATE TABLE ScheduledTask (
-    TaskId BIGINT PRIMARY KEY, -- long
+    TaskId BIGINT, -- long
     IsActive BIT NOT NULL, -- bool
     CronExpression NVARCHAR(100) NOT NULL,
     TaskName NVARCHAR(100) NOT NULL,
@@ -16,6 +22,9 @@ CREATE TABLE ScheduledTask (
     DayOffset INT NOT NULL, -- int
     TaskJsonDefinitionId BIGINT NOT NULL -- long
 );
+GO
+
+CREATE CLUSTERED INDEX CIDX_ScheduledTask_IsActive ON ScheduledTask (TaskId, IsActive);
 GO
 
 -- 2. Insert the data

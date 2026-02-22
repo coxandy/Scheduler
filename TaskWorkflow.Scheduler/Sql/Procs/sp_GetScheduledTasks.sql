@@ -19,6 +19,7 @@ BEGIN
         DayOffset,
         TaskJsonDefinitionId
     FROM ScheduledTask
-    WHERE (@TaskId IS NULL OR TaskId = @TaskId);
+    WHERE (@TaskId IS NULL OR TaskId = @TaskId)
+    AND IsActive = 1 -- Only return active tasks
 END
 GO
