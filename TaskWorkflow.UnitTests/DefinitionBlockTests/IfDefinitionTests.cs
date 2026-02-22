@@ -190,7 +190,7 @@ public class IfDefinitionTests
                                 "RightOperand": "3",
                                 "Operator": "==",
                                 "OnTrueAction":  "Proceed",
-                                "OnFalseAction": "AbortTask"
+                                "OnFalseAction": "AbortTaskAndReportError"
                             }
                         ]
                     },
@@ -236,7 +236,7 @@ public class IfDefinitionTests
                                 "RightOperand": "0",
                                 "Operator": "==",
                                 "OnTrueAction":  "Proceed",
-                                "OnFalseAction": "AbortTask"
+                                "OnFalseAction": "AbortTaskAndReportError"
                             }
                         ]
                     },
@@ -281,7 +281,7 @@ public class IfDefinitionTests
                                 "RightOperand": "",
                                 "Operator": "!=",
                                 "OnTrueAction":  "Proceed",
-                                "OnFalseAction": "AbortTask"
+                                "OnFalseAction": "AbortTaskAndReportError"
                             }
                         ]
                     },
@@ -328,7 +328,7 @@ public class IfDefinitionTests
                                 "RightOperand": "0000",
                                 "Operator": "==",
                                 "OnTrueAction":  "Proceed",
-                                "OnFalseAction": "AbortTask"
+                                "OnFalseAction": "AbortTaskAndReportError"
                             }
                         ]
                     },
@@ -373,7 +373,7 @@ public class IfDefinitionTests
                                 "RightOperand": "2097",
                                 "Operator": "==",
                                 "OnTrueAction":  "Proceed",
-                                "OnFalseAction": "AbortTask"
+                                "OnFalseAction": "AbortTaskAndReportError"
                             }
                         ]
                     },
@@ -416,7 +416,7 @@ public class IfDefinitionTests
                                 "RightOperand": "0",
                                 "Operator": "==",
                                 "OnTrueAction":  "Proceed",
-                                "OnFalseAction": "AbortTask"
+                                "OnFalseAction": "AbortTaskAndReportError"
                             }
                         ]
                     },

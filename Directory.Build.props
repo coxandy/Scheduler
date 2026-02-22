@@ -1,0 +1,8 @@
+<Project>
+
+  <ItemGroup>
+    <!-- Exclude .sql files from the build across all projects -->
+    <None Remove="**\*.sql" />
+  </ItemGroup>
+
+</Project>

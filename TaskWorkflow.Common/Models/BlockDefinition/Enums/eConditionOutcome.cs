@@ -2,6 +2,7 @@ namespace TaskWorkflow.Common.Models.BlockDefinition.Enums;
 
 public enum eConditionOutcome
 {
-    AbortTask=1,
-    Proceed=2
+    AbortTaskAndReportError=1,
+    AbortTask=2,
+    Proceed=3
 }

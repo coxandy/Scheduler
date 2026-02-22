@@ -32,8 +32,16 @@ public class IfDefinition: IDefinition
             eConditionOutcome action = outcome ? condition.OnTrueAction : condition.OnFalseAction;
             Log.Debug($"Condition '{condition.ConditionName}' evaluated to {outcome}. Action: {action}");
 
+            if (action == eConditionOutcome.AbortTaskAndReportError)
+            {
+                // abort task & report error
+                this.OnError = eOnError.AbortTaskAndReportError;
+                throw new OperationCanceledException($"Condition '{condition.ConditionName}' result was {outcome}. Task aborted.");
+            }
             if (action == eConditionOutcome.AbortTask)
             {
+                // just abort task without reporting error
+                this.OnError = eOnError.AbortTask;
                 throw new OperationCanceledException($"Condition '{condition.ConditionName}' result was {outcome}. Task aborted.");
             }
             // else eConditionOutcome.Proceed - continue to next condition

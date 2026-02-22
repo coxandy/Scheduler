@@ -23,7 +23,7 @@ public static class CommonIfConditionHelper
                     case ">":
                         return double.TryParse(leftOperand, out var leftValue2) && double.TryParse(rightOperand, out var rightValue2) && leftValue2 > rightValue2;
                     default:
-                        throw new ArgumentException($"Unknown operator: {conditionOperator}");
+                        throw new ArgumentException($"ProcessIfConditionAsync() - Unknown operator: {conditionOperator}");
                 }
         });
     }
