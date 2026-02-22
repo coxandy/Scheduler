@@ -286,7 +286,7 @@ public class DatasourceDefinitionTests
                                 "DSTableName": "Employees",
                                 "CsvFilePath": "{{jsonSafePath}}",
                                 "CsvFileName": "employees.csv",
-                                "CsvFileHeader": true,
+                                "HasFileHeader": true,
                                 "LimitColumns": ["Name", "Department", "Salary"]
                             }
                         ]
@@ -347,7 +347,7 @@ public class DatasourceDefinitionTests
                                 "DSTableName": "Products",
                                 "CsvFilePath": "{{jsonSafePath}}",
                                 "CsvFileName": "products.csv",
-                                "CsvFileHeader": true,
+                                "HasFileHeader": true,
                                 "WhereFilter": "Category = 'Electronics' AND InStock = 'True'"
                             }
                         ]

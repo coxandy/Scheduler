@@ -12,7 +12,7 @@ public class DataSource
     public string? DSTableName { get; set; }
     public List<SqlParameter>? Params { get; set; }
 
-    public bool CsvFileHeader { get; set; }
+    public bool HasFileHeader { get; set; }
     public string? CsvFilePath { get; set; }
     public string? CsvFileName { get; set; }
     public char CsvFileDelimiter { get; set; }

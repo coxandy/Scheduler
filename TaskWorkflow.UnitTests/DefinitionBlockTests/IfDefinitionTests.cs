@@ -39,7 +39,7 @@ public class IfDefinitionTests
                             "DSTableName": "ReportStatus",
                             "CsvFilePath": "{{jsonSafePath}}",
                             "CsvFileName": "reportstatus.csv",
-                            "CsvFileHeader": true
+                            "HasFileHeader": true
                         }
                     ]
                 },
@@ -156,7 +156,7 @@ public class IfDefinitionTests
                     "DSTableName": "ReportStatus",
                     "CsvFilePath": "{{jsonSafePath}}",
                     "CsvFileName": "reportstatus.csv",
-                    "CsvFileHeader": true
+                    "HasFileHeader": true
                 }
             ]
         }

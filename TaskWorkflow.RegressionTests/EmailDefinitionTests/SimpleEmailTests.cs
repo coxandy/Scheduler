@@ -44,7 +44,7 @@ public class SimpleEmailTests : IDisposable
                             "DSTableName": "CsvData",
                             "CsvFilePath": "{{Path.GetDirectoryName(csvPath)!.Replace("\\", "\\\\")}}",
                             "CsvFileName": "{{Path.GetFileName(csvPath)}}",
-                            "CsvFileHeader": true,
+                            "HasFileHeader": true,
                             "CsvFileDelimiter": ","
                         }
                     ]

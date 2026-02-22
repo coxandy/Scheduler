@@ -21,7 +21,7 @@ public class TaskFailureTests
                             "DSTableName": "CsvData",
                             "CsvFilePath": "C:\\NonExistent\\Path",
                             "CsvFileName": "missing.csv",
-                            "CsvFileHeader": true,
+                            "HasFileHeader": true,
                             "CsvFileDelimiter": ","
                         }
                     ]

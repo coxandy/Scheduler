@@ -77,7 +77,7 @@ public class DatasourceDefinition: IDefinition
         var dt = new DataTable(dataSource.DSTableName);
         int startIndex = 0;
 
-        if (dataSource.CsvFileHeader)
+        if (dataSource.HasFileHeader)
         {
             foreach (var header in rows[0])
                 dt.Columns.Add(header);

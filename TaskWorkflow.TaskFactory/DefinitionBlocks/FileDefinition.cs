@@ -4,6 +4,7 @@ using TaskWorkflow.Common.Tasks;
 using TaskWorkflow.Common.Models;
 using TaskWorkflow.Common.Models.BlockDefinition;
 using TaskWorkflow.Common.Models.BlockDefinition.Enums;
+using System.IO;
 
 namespace TaskWorkflow.TaskFactory.DefinitionBlocks;
 
@@ -31,25 +32,25 @@ public class FileDefinition : IDefinition
             var sourcePath = Path.Combine(file.SourceFilePath, file.SourceFileName);
             var targetPath = Path.Combine(file.TargetFilePath, file.TargetFileName);
 
+            if (!File.Exists(sourcePath))  throw new FileNotFoundException($"Missing File : '{sourcePath}'");
+
             switch (file.Action)
             {
                 case eFileAction.Copy:
                     Log.Debug($"Copying '{sourcePath}' to '{targetPath}'");
                     EnsureTargetDirectory(file.TargetFilePath);
-                    System.IO.File.Copy(sourcePath, targetPath, overwrite: true);
+                    File.Copy(sourcePath, targetPath, overwrite: true);
                     break;
 
                 case eFileAction.Move:
                     Log.Debug($"Moving '{sourcePath}' to '{targetPath}'");
                     EnsureTargetDirectory(file.TargetFilePath);
-                    System.IO.File.Move(sourcePath, targetPath, overwrite: true);
+                    File.Move(sourcePath, targetPath, overwrite: true);
                     break;
 
                 case eFileAction.Delete:
                     Log.Debug($"Deleting '{sourcePath}'");
-                    if (!System.IO.File.Exists(sourcePath))
-                        throw new FileNotFoundException($"File not found for deletion: '{sourcePath}'");
-                    System.IO.File.Delete(sourcePath);
+                    File.Delete(sourcePath);
                     break;
 
                 case eFileAction.Transform:
@@ -66,27 +67,45 @@ public class FileDefinition : IDefinition
 
     private static void ApplyTransforms(DefinitionFile file, string sourcePath, string targetPath)
     {
-        if (!System.IO.File.Exists(sourcePath))
+        if (!File.Exists(sourcePath))
             throw new FileNotFoundException($"Source file not found: '{sourcePath}'");
 
-        var lines = System.IO.File.ReadAllLines(sourcePath).ToList();
+        var lines = File.ReadAllLines(sourcePath).ToList();
 
         foreach (var transform in file.Transforms)
         {
-            Log.Debug($"Applying transform '{transform.TransformType}' with param '{transform.TransformParam}'");
+            Log.Debug($"Applying transform '{transform.TransformType}' with params: '{string.Join(";", transform.TransformParams)}'");
             lines = ApplyTransform(lines, transform);
         }
 
-        System.IO.File.WriteAllLines(targetPath, lines);
+        File.WriteAllLines(targetPath, lines);
     }
 
     private static List<string> ApplyTransform(List<string> lines, FileTransform transform)
     {
-        // Transform dispatch — extend TransformType cases as needed
-        return transform.TransformType switch
+        List<string> newLines = new List<string>();
+        
+        switch (transform.TransformType )
         {
-            _ => throw new NotSupportedException($"Transform type '{transform.TransformType}' is not supported.")
+            case eFileTransformation.RegexMatch:
+                newLines = lines.Where(line => System.Text.RegularExpressions.Regex.IsMatch(line, transform.TransformParams[0])).ToList();
+                break;
+            case eFileTransformation.RegexReplace:
+                newLines = lines.Select(line => System.Text.RegularExpressions.Regex.Replace(line, transform.TransformParams[0], transform.TransformParams[1])).ToList();
+                break;
+            case eFileTransformation.Replace:
+                newLines = lines.Select(line => line.Replace(transform.TransformParams[0], transform.TransformParams[1])).ToList();
+                break;
+            case eFileTransformation.ToLower:
+                newLines = lines.Select(line => line.ToLower()).ToList();
+                break;
+            case eFileTransformation.ToUpper:
+                newLines = lines.Select(line => line.ToUpper()).ToList();
+                break;
+            default:
+                throw new NotSupportedException($"Transform type '{transform.TransformType}' is not supported.");
         };
+        return newLines;
     }
 
     private static void EnsureTargetDirectory(string targetFilePath)

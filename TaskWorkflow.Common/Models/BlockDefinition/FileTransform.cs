@@ -1,7 +1,9 @@
+using TaskWorkflow.Common.Models.BlockDefinition.Enums;
+
 namespace TaskWorkflow.Common.Models.BlockDefinition;
 
 public class FileTransform
 {
-    public string TransformType { get; set; } = string.Empty;
-    public string TransformParam { get; set; } = string.Empty;
+    public eFileTransformation TransformType { get; set; }
+    public List<string> TransformParams { get; set; } = new();
 }

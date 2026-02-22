@@ -70,7 +70,7 @@ public class PivotDefinitionTests
                                 "DSTableName": "SalesData",
                                 "CsvFilePath": "{{jsonSafePath}}",
                                 "CsvFileName": "sales.csv",
-                                "CsvFileHeader": true
+                                "HasFileHeader": true
                             }
                         ]
                     },
@@ -145,7 +145,7 @@ public class PivotDefinitionTests
                                 "DSTableName": "Expenses",
                                 "CsvFilePath": "{{jsonSafePath}}",
                                 "CsvFileName": "expenses.csv",
-                                "CsvFileHeader": true
+                                "HasFileHeader": true
                             }
                         ]
                     },
@@ -215,7 +215,7 @@ public class PivotDefinitionTests
                                 "DSTableName": "SprintData",
                                 "CsvFilePath": "{{jsonSafePath}}",
                                 "CsvFileName": "sprints.csv",
-                                "CsvFileHeader": true
+                                "HasFileHeader": true
                             }
                         ]
                     },
@@ -310,7 +310,7 @@ public class PivotDefinitionTests
                                 "DSTableName": "<@@SourceTable@@>",
                                 "CsvFilePath": "{{jsonSafePath}}",
                                 "CsvFileName": "markets.csv",
-                                "CsvFileHeader": true
+                                "HasFileHeader": true
                             }
                         ]
                     },
